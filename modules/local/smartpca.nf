@@ -1,28 +1,20 @@
-process SMARTPCA {
-    tag '$bam'
+process SMARTPCA_PAR {
+    tag '$batch_id'
     label 'process_medium'
-
-    // TODO nf-core: List required Conda package(s).
-    //               Software MUST be pinned to channel (i.e. "bioconda"), version (i.e. "1.10").
-    //               For Conda, the build (i.e. "h9402c20_2") must be EXCLUDED to support installation on different operating systems.
-    // TODO nf-core: See section in main README for further information regarding finding and adding container addresses to the section below.
-    conda "YOUR-TOOL-HERE"
+    cpus 2
 
     input:
-    // TODO nf-core: Where applicable all sample-specific information e.g. "id", "single_end", "read_group"
-    //               MUST be provided as an input via a Groovy Map called "meta".
-    //               This information may not be required in some instances e.g. indexing reference genome files:
-    //               https://github.com/nf-core/modules/blob/master/modules/nf-core/bwa/index/main.nf
-    // TODO nf-core: Where applicable please provide/convert compressed files as input/output
-    //               e.g. "*.fastq.gz" and NOT "*.fastq", "*.bam" and NOT "*.sam" etc.
-    path bam
+    val batch_id
+    val eigen_file
+    val eigen_ind_file
+    val pop_file
+    val n_chr
+    val lsqprj
+    path wdir
 
     output:
-    // TODO nf-core: Named file extensions MUST be emitted for ALL output channels
-    path "*.bam", emit: bam
-    // TODO nf-core: List additional required output channels/values here
-    path "versions.yml"           , emit: versions
-
+    path par.${batch_id}, emit: par_file
+    
     when:
     task.ext.when == null || task.ext.when
 
@@ -39,31 +31,56 @@ process SMARTPCA {
     // TODO nf-core: Please replace the example samtools command below with your module's command
     // TODO nf-core: Please indent the command appropriately (4 spaces!!) to help with readability ;)
     """
-    samtools \\
-        sort \\
-        $args \\
-        -@ $task.cpus \\
-        $bam
-
-    cat <<-END_VERSIONS > versions.yml
-    "${task.process}":
-        : \$(echo \$(samtools --version 2>&1) | sed 's/^.*samtools //; s/Using.*\$//' ))
-    END_VERSIONS
-    """
-
-    stub:
-    def args = task.ext.args ?: ''
-    
-    // TODO nf-core: A stub section should mimic the execution of the original module as best as possible
-    //               Have a look at the following examples:
-    //               Simple example: https://github.com/nf-core/modules/blob/818474a292b4860ae8ff88e149fbcda68814114d/modules/nf-core/bcftools/annotate/main.nf#L47-L63
-    //               Complex example: https://github.com/nf-core/modules/blob/818474a292b4860ae8ff88e149fbcda68814114d/modules/nf-core/bedtools/split/main.nf#L38-L54
-    """
-    touch ${prefix}.bam
-
-    cat <<-END_VERSIONS > versions.yml
-    "${task.process}":
-        : \$(echo \$(samtools --version 2>&1) | sed 's/^.*samtools //; s/Using.*\$//' ))
-    END_VERSIONS
+    echo '
+genotypename:   ${eigen_file}.geno
+snpname:        ${eigen_file}.snp
+indivname:      ${eigen_ind_file}
+evecoutname:    ${batch_id}.evec
+evaloutname:    ${batch_id}.eval
+lsqproject:     ${lsqprj}
+numthreads:     ${task.cpus}
+numchrom:       ${n_chr}
+poplistname:    ${pop_file}
+numoutlieriter: 0' > ${wdir}/par.${batch_id}
+    echo '${args}' >> ${wdir}/par.${batch_id}
     """
 }
+
+process SMARTPCA {
+    tag '$batch_id'
+    label 'process_medium'
+    cpus 2
+
+    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+        'https://depot.galaxyproject.org/singularity/eigensoft%3A8.0.0--h6a739c9_3' :
+        '/maps/projects/mjolnir1/people/gnr216/a-software/sigularity_module/eigensoft:8.0.0--h6a739c9_3'}"
+
+    input:
+    path par_file
+    val batch_id
+
+    output:
+    path "*.evec", emit: evalout
+    path "*.evec", emit: evecout
+    path "log.*", emit: log_pca
+
+    when:
+    task.ext.when == null || task.ext.when
+
+    script:
+    def args = task.ext.args ?: ''
+    """
+    smartpca \\
+        -p ${par_file} \\
+        > log.${batch_id}
+    
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        : \$(echo \$(samtools --version 2>&1) | sed 's/^.*samtools //; s/Using.*\$//' ))
+    END_VERSIONS
+    """
+
+}
+
+
+
