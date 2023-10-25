@@ -48,9 +48,11 @@ process SMARTPCA {
     label 'process_medium'
     cpus 2
 
-    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/eigensoft%3A8.0.0--h6a739c9_3' :
-        'eigensoft:8.0.0--h6a739c9_3'}"
+    // container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+    //     'https://depot.galaxyproject.org/singularity/eigensoft%3A8.0.0--h6a739c9_3' :
+    //     'eigensoft:8.0.0--h6a739c9_3'}"
+
+    container "eigensoft:8.0.0--h6a739c9_3"
 
     input:
     path par_file
