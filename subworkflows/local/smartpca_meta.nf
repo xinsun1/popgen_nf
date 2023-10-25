@@ -7,26 +7,10 @@ nextflow.enable.dsl = 2
 
 include { SMARTPCA_PAR; SMARTPCA } from '../../modules/local/smartpca.nf'
 
-// workflow {
-//     Channel.fromFilePairs("data/reads/*/*_R{1,2}.fastq.gz")
-//     | map { id, reads ->
-//         (sample, replicate, type) = id.tokenize("_")
-//         (treatmentFwd, treatmentRev) = reads*.parent*.name*.minus(~/treatment/)
-//         meta = [
-//             sample:sample,
-//             replicate:replicate,
-//             type:type,
-//             treatmentFwd:treatmentFwd,
-//             treatmentRev:treatmentRev,
-//         ]
-//         [meta, reads]
-//     }
-//     | view
-// }
 
 workflow {
-    // take:
-    // meta_batch
+    take:
+    meta_batch
 
     main:
     Channel.fromPath(meta_batch)
