@@ -8,7 +8,7 @@ process SMARTPCA_PAR {
     tuple val(batch_id), val(eigen_meta), val(para_meta)
 
     output:
-    path par.${batch_id}, emit: par_file
+    path "par.${batch_id}", emit: par_file
     
     when:
     task.ext.when == null || task.ext.when
