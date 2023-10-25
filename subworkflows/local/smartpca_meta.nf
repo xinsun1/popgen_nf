@@ -3,7 +3,7 @@
 //
 
 
-include { SMARTPCA_PAR, SMARTPCA } from '../../modules/local/smartpca.nf'
+include { SMARTPCA_PAR; SMARTPCA } from '../../modules/local/smartpca.nf'
 
 // workflow {
 //     Channel.fromFilePairs("data/reads/*/*_R{1,2}.fastq.gz")
