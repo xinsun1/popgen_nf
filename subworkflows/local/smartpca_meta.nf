@@ -30,9 +30,8 @@ workflow SMARTPCA_META {
     | set { batches }
     
     // batches.view { it }
-    
-    SMARTPCA_PAR ( batches )
-
+    ch_par = SMARTPCA_PAR ( batches )
+    ch_par.view { it }
 
     // | set(par_arg)
     // | SMARTPCA_PAR( ... )
