@@ -4,11 +4,9 @@
 
 nextflow.enable.dsl = 2
 
-
 include { SMARTPCA_PAR; SMARTPCA } from '../../modules/local/smartpca.nf'
 
-
-workflow {
+workflow SMARTPCA_META {
     take:
     meta_batch
 
@@ -17,10 +15,11 @@ workflow {
     | splitCsv ( header: true, sep: '\t' )
     | map { row ->
         eigen_meta = [
-            snp:val(row.wdir"/"row.eigen_snp),
-            geno:val(row.wdir"/"row.eigen_geno),
-            pop:val(row.wdir"/"row.eigen_pop),
-            pop_list:val(row.wdir"/"row.pop_list)
+            t:val(row.wdir)
+            // snp:val(row.wdir"/"row.eigen_snp),
+            // geno:val(row.wdir"/"row.eigen_geno),
+            // pop:val(row.wdir"/"row.eigen_pop),
+            // pop_list:val(row.wdir"/"row.pop_list)
         ]
         para_meta = [
             nchr:val(row.n_chr),
