@@ -16,12 +16,12 @@ workflow SMARTPCA_META {
     | map { row ->
         eigen_meta = [
             snp:      "${row.wdir}/${row.eigen_snp}",
-            geno:     "${row.wdir}/${row.eigen_geno$}",
-            ind:      "${row.wdir}/${row.eigen_pop}",
+            geno:     "${row.wdir}/${row.eigen_geno}",
+            ind:      "${row.wdir}/${row.eigen_ind}",
             pop_list: "${row.wdir}/${row.pop_list}"
         ]
         para_meta = [
-            nchr: row.n_chr,
+            nchr: row.nchr,
             lsqprj: row.lsqprj,
             args: row.args
         ]    
