@@ -5,38 +5,29 @@
 
 include { SMARTPCA_PAR, SMARTPCA } from '../../modules/local/smartpca.nf'
 
-workflow {
-    Channel.fromFilePairs("data/reads/*/*_R{1,2}.fastq.gz")
-    | map { id, reads ->
-        (sample, replicate, type) = id.tokenize("_")
-        (treatmentFwd, treatmentRev) = reads*.parent*.name*.minus(~/treatment/)
-        meta = [
-            sample:sample,
-            replicate:replicate,
-            type:type,
-            treatmentFwd:treatmentFwd,
-            treatmentRev:treatmentRev,
-        ]
-        [meta, reads]
-    }
-    | view
-}
+// workflow {
+//     Channel.fromFilePairs("data/reads/*/*_R{1,2}.fastq.gz")
+//     | map { id, reads ->
+//         (sample, replicate, type) = id.tokenize("_")
+//         (treatmentFwd, treatmentRev) = reads*.parent*.name*.minus(~/treatment/)
+//         meta = [
+//             sample:sample,
+//             replicate:replicate,
+//             type:type,
+//             treatmentFwd:treatmentFwd,
+//             treatmentRev:treatmentRev,
+//         ]
+//         [meta, reads]
+//     }
+//     | view
+// }
 
 workflow SMARTPCA_META {
     take:
     meta_batch
 
-val batch_id
-    val eigen_file
-    val eigen_ind_file
-    val pop_file
-    val n_chr
-    val lsqprj
-    path wdir
-
-
     main:
-    Channel.fromPath(batch)
+    Channel.fromPath(meta_batch)
     | splitCsv ( header: true, sep: '\t' )
     | map { row ->
         eigen_meta = [
