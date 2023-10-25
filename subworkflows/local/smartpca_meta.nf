@@ -2,6 +2,8 @@
 // Generate smartpca par file and run smartpca from metafile input
 //
 
+nextflow.enable.dsl = 2
+
 
 include { SMARTPCA_PAR; SMARTPCA } from '../../modules/local/smartpca.nf'
 
@@ -52,4 +54,9 @@ workflow SMARTPCA_META {
     // emit:
     // reads                                     // channel: [ val(meta), [ reads ] ]
     // versions = SAMPLESHEET_CHECK.out.versions // channel: [ versions.yml ]
+}
+
+
+workflow {
+    SMARTPCA_META ( params.meta )
 }
