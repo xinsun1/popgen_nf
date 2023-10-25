@@ -31,10 +31,9 @@ workflow SMARTPCA_META {
     // batches.view { it }
     
     ch_par = SMARTPCA_PAR ( batches )
-    //ch_par.view { it }
+    ch_par.view { it }
 
-
-    // | SMARTPCA() 
+    //SMARTPCA() 
 
 
     // emit:
