@@ -9,6 +9,7 @@ process SMARTPCA_PAR {
 
     output:
     path "par.${batch_id}", emit: par_file
+    val batch_id, emit: batch_id
     
     when:
     task.ext.when == null || task.ext.when
@@ -36,6 +37,7 @@ evaloutname:    ${batch_id}.eval
 lsqproject:     ${para_meta.lsqprj}
 numthreads:     ${task.cpus}
 numchrom:       ${para_meta.nchr}
+threads:        4
 numoutlieriter: 0' > par.${batch_id}
     echo '${para_meta.args}' >> par.${batch_id}
     """

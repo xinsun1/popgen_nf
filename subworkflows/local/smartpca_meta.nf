@@ -28,13 +28,12 @@ workflow SMARTPCA_META {
         [row.batch_id, eigen_meta, para_meta]
     }
     | set { batches }
-    
     // batches.view { it }
+    
     ch_par = SMARTPCA_PAR ( batches )
-    ch_par.view { it }
+    //ch_par.view { it }
 
-    // | set(par_arg)
-    // | SMARTPCA_PAR( ... )
+
     // | SMARTPCA() 
 
 
