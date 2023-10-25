@@ -1,7 +1,7 @@
 process SMARTPCA_PAR {
     tag '$batch_id'
     label 'process_medium'
-    cpus 2
+    cpus 1
 
     input:
     // [row.batch_id, eigen_meta, para_meta]

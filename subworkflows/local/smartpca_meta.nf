@@ -27,7 +27,10 @@ workflow SMARTPCA_META {
         ]    
         [row.batch_id, eigen_meta, para_meta]
     }
-    | view
+    | set { batches }
+    
+    SMARTPCA_PAR ( batches )
+
 
     // | set(par_arg)
     // | SMARTPCA_PAR( ... )
