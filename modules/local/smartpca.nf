@@ -52,7 +52,7 @@ process SMARTPCA {
     //     'https://depot.galaxyproject.org/singularity/eigensoft%3A8.0.0--h6a739c9_3' :
     //     'eigensoft:8.0.0--h6a739c9_3'}"
 
-    container "eigensoft:8.0.0--h6a739c9_3"
+    container "/maps/projects/mjolnir1/people/gnr216/a-software/sigularity_module/eigensoft:8.0.0--h6a739c9_3"
 
     input:
     path par_file
