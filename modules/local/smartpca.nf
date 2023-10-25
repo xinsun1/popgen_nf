@@ -4,13 +4,8 @@ process SMARTPCA_PAR {
     cpus 2
 
     input:
-    val batch_id
-    val eigen_file
-    val eigen_ind_file
-    val pop_file
-    val n_chr
-    val lsqprj
-    path wdir
+    // [row.batch_id, eigen_meta, para_meta]
+    tuple val(batch_id), val(eigen_meta), val(para_meta)
 
     output:
     path par.${batch_id}, emit: par_file
@@ -32,17 +27,17 @@ process SMARTPCA_PAR {
     // TODO nf-core: Please indent the command appropriately (4 spaces!!) to help with readability ;)
     """
     echo '
-genotypename:   ${eigen_file}.geno
-snpname:        ${eigen_file}.snp
-indivname:      ${eigen_ind_file}
+genotypename:   ${eigen_meta.geno}
+snpname:        ${eigen_meta.snp}
+indivname:      ${eigen_meta.ind}
+poplistname:    ${eigen_meta.pop_list}
 evecoutname:    ${batch_id}.evec
 evaloutname:    ${batch_id}.eval
-lsqproject:     ${lsqprj}
+lsqproject:     ${para_meta.lsqprj}
 numthreads:     ${task.cpus}
-numchrom:       ${n_chr}
-poplistname:    ${pop_file}
-numoutlieriter: 0' > ${wdir}/par.${batch_id}
-    echo '${args}' >> ${wdir}/par.${batch_id}
+numchrom:       ${para_meta.nchr}
+numoutlieriter: 0' > par.${batch_id}
+    echo '${para_meta.args}' >> par.${batch_id}
     """
 }
 
