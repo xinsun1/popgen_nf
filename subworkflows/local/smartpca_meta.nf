@@ -15,16 +15,16 @@ workflow SMARTPCA_META {
     | splitCsv ( header: true, sep: '\t' )
     | map { row ->
         eigen_meta = [
-            t:val(row.wdir)
+            t: row.wdir
             // snp:val(row.wdir"/"row.eigen_snp),
             // geno:val(row.wdir"/"row.eigen_geno),
             // pop:val(row.wdir"/"row.eigen_pop),
             // pop_list:val(row.wdir"/"row.pop_list)
         ]
         para_meta = [
-            nchr:val(row.n_chr),
-            lsqprj:val(row.lsqprj),
-            args:val(row.args)
+            nchr: row.n_chr,
+            lsqprj: row.lsqprj,
+            args: row.args
         ]    
         [row.batch_id, eigen_meta, para_meta]
     }
