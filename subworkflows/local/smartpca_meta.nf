@@ -24,9 +24,9 @@ include { SMARTPCA_PAR; SMARTPCA } from '../../modules/local/smartpca.nf'
 //     | view
 // }
 
-workflow SMARTPCA_META {
-    take:
-    meta_batch
+workflow {
+    // take:
+    // meta_batch
 
     main:
     Channel.fromPath(meta_batch)
@@ -46,6 +46,7 @@ workflow SMARTPCA_META {
         [row.batch_id, eigen_meta, para_meta]
     }
     | view
+
     // | set(par_arg)
     // | SMARTPCA_PAR( ... )
     // | SMARTPCA() 
