@@ -15,7 +15,7 @@ workflow SMARTPCA_META {
     | splitCsv ( header: true, sep: '\t' )
     | map { row ->
         eigen_meta = [
-            snp:      "${row.wdir}/${row.eigen_snp}"
+            snp:      "${row.wdir}/${row.eigen_snp}",
             geno:     "${row.wdir}/${row.eigen_geno$}",
             ind:      "${row.wdir}/${row.eigen_pop}",
             pop_list: "${row.wdir}/${row.pop_list}"
@@ -27,9 +27,8 @@ workflow SMARTPCA_META {
         ]    
         [row.batch_id, eigen_meta, para_meta]
     }
-    | view
-    // | set { batches }
-    // batches.view { it }
+    | set { batches }
+    batches.view { it }
     
     // SMARTPCA_PAR ( batches )
 
