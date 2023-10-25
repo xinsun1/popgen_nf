@@ -50,7 +50,7 @@ process SMARTPCA {
 
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/eigensoft%3A8.0.0--h6a739c9_3' :
-        '/maps/projects/mjolnir1/people/gnr216/a-software/sigularity_module/eigensoft:8.0.0--h6a739c9_3'}"
+        'eigensoft:8.0.0--h6a739c9_3'}"
 
     input:
     path par_file

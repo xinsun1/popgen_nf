@@ -35,7 +35,7 @@ workflow SMARTPCA_META {
     ch_par.batch_id.view { it }
     
 
-    //SMARTPCA() 
+    SMARTPCA(ch_par.par_file, ch_par.batch_id) 
 
 
     // emit:
