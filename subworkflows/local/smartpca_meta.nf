@@ -3,7 +3,6 @@
 //
 
 nextflow.enable.dsl = 2
-singularity.enabled = true
 
 include { SMARTPCA_PAR; SMARTPCA } from '../../modules/local/smartpca.nf'
 
