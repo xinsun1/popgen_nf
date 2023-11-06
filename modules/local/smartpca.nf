@@ -1,6 +1,7 @@
 process SMARTPCA_PAR {
     tag '$batch_id'
-    label 'process_medium'
+    label 'process_local'
+    executor 'local'
     cpus 1
 
     input:
@@ -45,8 +46,14 @@ numoutlieriter: 0' > par.${batch_id}
 
 process SMARTPCA {
     tag '$batch_id'
-    label 'process_medium'
-    cpus 2
+    label 'process_light'
+    executor 'slurm'
+    cpus 4
+    time '1h'
+    queue 'cpuqueue'
+    memory '2 GB'
+    // remember to set executor.perCpuMemAllocation = true in config file
+
 
     // container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
     //     'https://depot.galaxyproject.org/singularity/eigensoft%3A8.0.0--h6a739c9_3' :
