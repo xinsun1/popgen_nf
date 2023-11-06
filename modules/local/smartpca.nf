@@ -51,7 +51,7 @@ process SMARTPCA {
     cpus 4
     time '6h'
     queue 'cpuqueue'
-    memory '2 GB'
+    memory '16 GB'
     // remember to set executor.perCpuMemAllocation = true in config file
 
 
