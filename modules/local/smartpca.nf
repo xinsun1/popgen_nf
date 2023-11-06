@@ -77,6 +77,7 @@ process SMARTPCA {
     def args = task.ext.args ?: ''
     """
     echo \$(pwd)
+    who
     cd /maps/projects/mjolnir1/people/gnr216/1-wolf/4-popstructure/impute_3rd/1-pca/
     ls 
     smartpca \\
