@@ -76,7 +76,7 @@ process SMARTPCA {
     script:
     def args = task.ext.args ?: ''
     """
-    echo $(pwd)
+    echo \$(pwd)
     smartpca \\
         -p ${par_file} \\
         > log.${batch_id}
