@@ -49,9 +49,9 @@ process SMARTPCA {
     label 'process_light'
     executor 'slurm'
     cpus 4
-    time '1h'
+    time '6h'
     queue 'cpuqueue'
-    memory '2 GB'
+    memory '8 GB'
     // remember to set executor.perCpuMemAllocation = true in config file
 
 
