@@ -77,6 +77,7 @@ process SMARTPCA {
     def args = task.ext.args ?: ''
     """
     echo \$(pwd)
+    ls -lh /maps/projects/mjolnir1/people/gnr216/1-wolf/4-popstructure/impute_3rd/1-pca/p2.phased.all.info08.rm.mac1.w_norel_maf01_ld.ind
     smartpca \\
         -p ${par_file} \\
         > log.${batch_id}
