@@ -12,7 +12,7 @@ workflow GT_META {
 
     main:
     Channel.fromPath(meta_batch)
-    | splitCsv ( header: true, sep: '\t' )
+    | splitCsv ( header: true, sep: '\t', quote)
     | multiMap { row ->
         meta_gt:
             meta_gt = [
