@@ -6,6 +6,16 @@ nextflow.enable.dsl = 2
 
 include { MPILE_UP_CALL_REGION; READ_CHR } from '../../modules/local/gt_sam.nf'
 
+workflow GT_REGION {
+    take:
+    file_region
+
+    main:
+    Channel.fromPath( file_region.first() )
+    // | splitText()
+    | view { it }
+}
+
 workflow GT_META {
     take:
     meta_batch
