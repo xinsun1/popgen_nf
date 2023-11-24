@@ -4,7 +4,7 @@
 
 nextflow.enable.dsl = 2
 
-include { MPILE_UP_CALL_REGION, READ_CHR } from '../../modules/local/gt_sam.nf'
+include { MPILE_UP_CALL_REGION; READ_CHR } from '../../modules/local/gt_sam.nf'
 
 workflow GT_META {
     take:
