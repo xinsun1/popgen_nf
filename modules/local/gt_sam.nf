@@ -28,19 +28,7 @@ process SMARTPCA_PAR {
     // TODO nf-core: Please replace the example samtools command below with your module's command
     // TODO nf-core: Please indent the command appropriately (4 spaces!!) to help with readability ;)
     """
-    echo '
-genotypename:   ${eigen_meta.geno}
-snpname:        ${eigen_meta.snp}
-indivname:      ${eigen_meta.ind}
-poplistname:    ${eigen_meta.pop_list}
-evecoutname:    ${batch_id}.evec
-evaloutname:    ${batch_id}.eval
-lsqproject:     ${para_meta.lsqprj}
-numthreads:     ${task.cpus}
-numchrom:       ${para_meta.nchr}
-threads:        4
-numoutlieriter: 0' > par.${batch_id}
-    echo '${para_meta.args}' >> par.${batch_id}
+    
     """
 }
 
