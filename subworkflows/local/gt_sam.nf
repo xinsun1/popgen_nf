@@ -13,21 +13,15 @@ workflow GT_META {
     main:
     Channel.fromPath(meta_batch)
     | splitCsv ( header: true, sep: '\t')
-    | multiMap { row ->
-        meta_gt:
-            [
-                batch:          row.batch,
-                ref:            row.ref,
-                list_bam:       row.list_bam,
-                param_mpileup:  row.p_mpileup,
-                param_call:     row.p_call
-            ]
-        list_region:    row.list_region
-        // list_region:
-        //     [
-        //         batch:          row.batch,
-        //         list_region:    row.list_region
-        //     ]
+    | map { row ->
+        [
+            batch:          row.batch,
+            ref:            row.ref,
+            list_bam:       row.list_bam,
+            param_mpileup:  row.p_mpileup,
+            param_call:     row.p_call,
+            list_region:    row.list_region
+        ]
     }
     | set { meta_gt }
 
@@ -36,7 +30,7 @@ workflow GT_META {
     // | splitText()
     // | view { it }
 
-    ch_meta_run = READ_CHR( meta_gt.meta_gt, meta_gt.list_region)
+    ch_meta_run = READ_CHR( meta_gt)
     ch_meta_run.meta_batch | view { it }
     Channel.fromPath(ch_meta_run)
     | splitCsv ( header: true, sep: '\t')
