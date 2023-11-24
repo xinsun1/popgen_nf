@@ -1,42 +1,3 @@
-process READ_CHR {
-    tag '$batch_id'
-    label 'process_local'
-    executor 'local'
-    cpus 1
-
-    input:
-    val meta_gt
-
-    output:
-    path "${meta_gt.batch}.meta_run.chr", emit: meta_batch
-    
-    when:
-    task.ext.when == null || task.ext.when
-
-    script:
-    def args = task.ext.args ?: ''
-    
-    // TODO nf-core: Where possible, a command MUST be provided to obtain the version number of the software e.g. 1.10
-    //               If the software is unable to output a version number on the command-line then it can be manually specified
-    //               e.g. https://github.com/nf-core/modules/blob/master/modules/nf-core/homer/annotatepeaks/main.nf
-    //               Each software used MUST provide the software name and version number in the YAML version file (versions.yml)
-    // TODO nf-core: It MUST be possible to pass additional parameters to the tool as a command-line string via the "task.ext.args" directive
-    // TODO nf-core: If the tool supports multi-threading then you MUST provide the appropriate parameter
-    //               using the Nextflow "task" variable e.g. "--threads $task.cpus"
-    // TODO nf-core: Please replace the example samtools command below with your module's command
-    // TODO nf-core: Please indent the command appropriately (4 spaces!!) to help with readability ;)
-    """
-    echo 'batch\tref\tlist_bam\tp_mpileup\tp_call\tregion' > ${meta_gt.batch}.meta_run.chr
-    awk '{print "${meta_gt.batch}", \\
-        "${meta_gt.ref}", \\
-        "${meta_gt.list_bam}", \\
-        "${meta_gt.param_mpileup}", \\
-        "${meta_gt.param_call}", \\
-        \$1}' OFS='\t' ${meta_gt.list_region} \\
-        >> ${meta_gt.batch}.meta_run.chr 
-    """
-}
-
 process MPILE_UP_CALL_REGION {
     tag '$batch_id'
     label 'process_medium'
@@ -53,8 +14,7 @@ process MPILE_UP_CALL_REGION {
         'bcftools:A1.18--h8b25389_0'}"
 
     input:
-    val meta_gt
-    val region
+    tuple val(meta_gt), val(region)
 
     output:
     path "*.vcf.gz", emit: vcf
