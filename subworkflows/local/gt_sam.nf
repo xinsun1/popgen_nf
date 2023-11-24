@@ -29,8 +29,8 @@ workflow GT_META {
     meta.meta_gt | view { it }
     meta.list_region | view { it }
     
-    // Channel.fromPath(meta.list_region)
-    // | view{ it }
+    Channel.fromPath(meta.list_region)
+    | view{ it }
 
     // MPILE_UP_CALL_REGION ( meta_gt, ch_region )
     
