@@ -12,7 +12,7 @@ workflow GT_REGION {
 
     main:
     Channel.fromPath( file_region )
-    | splitText()
+    // | splitText()
     | view { it }
 }
 
