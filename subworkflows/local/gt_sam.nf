@@ -24,7 +24,7 @@ workflow GT_META {
         list_region = row.list_region
     }
     | set { meta }
-    // batches.view { it }
+    meta.view { it }
     
     Channel.fromPath(meta.list_region)
     | view{ it }
