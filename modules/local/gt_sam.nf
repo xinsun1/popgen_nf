@@ -5,7 +5,7 @@ process MPILE_UP_CALL_REGION {
     cpus 1
     time '48h'
     queue 'cpuqueue'
-    memory '16 GB'
+    memory '8 GB'
     // remember to set executor.perCpuMemAllocation = true in config file
 
 
