@@ -29,7 +29,7 @@ workflow GT_META {
     meta.meta_gt | view { it }
     meta.list_region | view { it }
     
-    Channel.fromPath(meta.list_region)
+    Channel.fromPath( Channel.value(meta.list_region) )
     | splitText()
     | view{ it }
 
