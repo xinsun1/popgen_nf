@@ -27,9 +27,9 @@ workflow GT_META {
 
     meta_gt | view { it }
     // // ch_re = Channel.fromPath( file(meta_gt.list_region) )
-    // Channel.fromPath( file(meta_gt.list_region) )
-    // | splitText()
-    // | view { it }
+    Channel.fromPath( path(meta_gt.list_region) )
+    | splitText()
+    | view { it }
 
     // ch_meta_run = READ_CHR( meta_gt)
     // ch_meta_run.meta_batch | view { it }
