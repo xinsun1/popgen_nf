@@ -28,7 +28,7 @@ process READ_CHR {
     // TODO nf-core: Please indent the command appropriately (4 spaces!!) to help with readability ;)
     """
     echo 'batch\tref\tlist_bam\tp_mpileup\tp_call\tregion' > ${meta.batch}.meta_run.chr
-    awk '{${meta.batch},${meta.ref}, ${meta.list_bam},${meta.param_mpileup},${meta.param_call},$1}' ${file_region} \\
+    awk '{${meta.batch},${meta.ref}, ${meta.list_bam},${meta.param_mpileup},${meta.param_call},\$1}' OFS='\t' ${file_region} \\
         >> ${meta.batch}.meta_run.chr 
     """
 }
