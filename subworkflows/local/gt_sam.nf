@@ -12,6 +12,7 @@ workflow GT_REGION {
     list_region
 
     main:
+    print("a")
     meta_gt | view { it }
     list_region | view {it}
 
