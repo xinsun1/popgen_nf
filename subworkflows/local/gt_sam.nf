@@ -11,7 +11,8 @@ workflow GT_REGION {
     meta_gt
 
     main:
-    Channel.fromPath(meta_gt.list_region)
+    meta_gt | view { it }
+    Channel.fromPath( meta_gt.list_region )
     | splitText()
     | view { it }
     
