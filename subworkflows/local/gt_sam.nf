@@ -13,19 +13,19 @@ workflow GT_META {
     main:
     Channel.fromPath(meta_batch)
     | splitCsv ( header: true, sep: '\t')
-    | map { row ->
-        [
+    | multimap { row ->
+        meta_gt = [
             batch:          row.batch,
             ref:            file(row.ref),
             list_bam:       file(row.list_bam),
             param_mpileup:  row.p_mpileup,
-            param_call:     row.p_call,
-            list_region:    file(row.list_region)
+            param_call:     row.p_call
         ]
+        list_region:    file(row.list_region)
     }
     | set { meta_gt }
 
-    meta_gt | view { it }
+    meta_gt.list_region | view { it }
     // // ch_re = Channel.fromPath( file(meta_gt.list_region) )
     Channel.fromPath( path(meta_gt.list_region) )
     | splitText()
