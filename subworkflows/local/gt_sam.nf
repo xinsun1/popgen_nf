@@ -32,23 +32,26 @@ workflow GT_META {
     main:
     Channel.fromPath(meta_batch)
     | splitCsv ( header: true, sep: '\t', quote: '"')
-    | map { row ->
-        [
-            ref:            row.ref,
-            list_bam:       row.list_bam,
-            batch:          row.batch,
-            param_mpileup:  row.p_mpileup,
-            param_call:     row.p_call,
-            list_region:    row.list_region
-        ]
+    | multiMap { row ->
+        meta:
+            [
+                ref:            row.ref,
+                list_bam:       row.list_bam,
+                batch:          row.batch,
+                param_mpileup:  row.p_mpileup,
+                param_call:     row.p_call,
+                list_region:    row.list_region
+            ]
+        list_region: row.list_region
+        
     }
     | set { meta_gt }
-    // meta_gt | view { it }
+    meta_gt.list_region | view { it }
 
-    // ch_re = Channel.fromPath( file(meta_gt.list_region) )
-    Channel.fromPath( file(meta_gt.list_region) )
-    | splitText()
-    | view { it }
+    // // ch_re = Channel.fromPath( file(meta_gt.list_region) )
+    // Channel.fromPath( file(meta_gt.list_region) )
+    // | splitText()
+    // | view { it }
 
     // GT_REGION( meta_gt )
 
