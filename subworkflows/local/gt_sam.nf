@@ -6,6 +6,24 @@ nextflow.enable.dsl = 2
 
 include { MPILE_UP_CALL_REGION } from '../../modules/local/gt_sam.nf'
 
+workflow GT_REGION {
+    take:
+    meta_gt
+
+    main:
+    Channel.fromPath(meta_gt.list_region)
+    | splitText()
+    | view { it }
+    
+
+    // MPILE_UP_CALL_REGION ( meta_gt, ch_region )
+    
+
+    // emit:
+    // reads                                     // channel: [ val(meta), [ reads ] ]
+    // versions = SAMPLESHEET_CHECK.out.versions // channel: [ versions.yml ]
+}
+
 workflow GT_META {
     take:
     meta_batch
@@ -24,14 +42,9 @@ workflow GT_META {
         ]
     }
     | set { meta_gt }
-    meta_gt | view { it }
-    
-    // Channel.fromPath( Channel.value(meta.list_region) )
-    // | splitText()
-    // | view{ it }
+    // meta_gt | view { it }
 
-    // MPILE_UP_CALL_REGION ( meta_gt, ch_region )
-    
+    GT_REGION( meta_gt )
 
     // emit:
     // reads                                     // channel: [ val(meta), [ reads ] ]
