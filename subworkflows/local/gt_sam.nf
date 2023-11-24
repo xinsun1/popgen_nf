@@ -29,6 +29,7 @@ workflow GT_META {
 
     Channel.fromPath(list_region)
     | splitText()
+    | map{it -> it.trim()}
     | set {ch_region}
     
     meta_gt
