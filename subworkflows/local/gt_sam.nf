@@ -24,7 +24,7 @@ workflow GT_META {
         ]
     }
     | set { meta }
-    meta.meta_gt | view { it }
+    meta | view { it }
     
     // Channel.fromPath( Channel.value(meta.list_region) )
     // | splitText()
