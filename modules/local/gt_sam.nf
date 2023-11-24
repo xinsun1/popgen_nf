@@ -14,7 +14,7 @@ process MPILE_UP_CALL_REGION {
         'bcftools:A1.18--h8b25389_0'}"
 
     publishDir(
-        path: "${params.publishdir}/gt_chr",
+        path: "${params.publishdir}gt_chr",
         mode: 'move',
     )
 
