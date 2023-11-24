@@ -29,7 +29,11 @@ workflow GT_META {
 
     Channel.fromPath(list_region)
     | splitText()
-    | view { it }
+    | set {ch_region}
+    
+    meta_gt
+        .combine(ch_region)
+        .view()
     
     
     // emit:
