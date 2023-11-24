@@ -19,7 +19,7 @@ workflow GT_META {
             list_bam:       row.list_bam,
             batch:          row.batch,
             param_mpileup:  row.p_mpileup,
-            param_call:     row.p_call
+            param_call:     row.p_call,
             list_region:    row.list_region
         ]
     }
