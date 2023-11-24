@@ -45,7 +45,12 @@ workflow GT_META {
     | set { meta_gt }
     // meta_gt | view { it }
 
-    GT_REGION( meta_gt )
+    // ch_re = Channel.fromPath( file(meta_gt.list_region) )
+    Channel.fromPath( file(meta_gt.list_region) )
+    | splitText()
+    | view { it }
+
+    // GT_REGION( meta_gt )
 
     // emit:
     // reads                                     // channel: [ val(meta), [ reads ] ]
