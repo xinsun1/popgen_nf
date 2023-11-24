@@ -8,7 +8,7 @@ include { MPILE_UP_CALL_REGION } from '../../modules/local/gt_sam.nf'
 
 workflow GT_REGION {
     take:
-    meta_batch
+    val meta
 
     main:
     Channel.fromPath(meta_batch)
@@ -29,7 +29,7 @@ workflow GT_REGION {
     meta.meta_gt | view { it }
     meta.list_region | view { it }
     
-    Channel.fromPath(meta.list_region)
+    ch_region = Channel.fromPath()
     | splitText()
     | view{ it }
 
@@ -49,25 +49,22 @@ workflow GT_META {
     main:
     Channel.fromPath(meta_batch)
     | splitCsv ( header: true, sep: '\t', quote: '"')
-    | multiMap { row ->
-        meta_gt:
-            meta_gt = [
-                ref:            row.ref,
-                list_bam:       row.list_bam,
-                batch:          row.batch,
-                param_mpileup:  row.p_mpileup,
-                param_call:     row.p_call
-            ]
-        list_region:
-            list_region = row.list_region
+    | map { row ->
+        meta_gt = [
+            ref:            row.ref,
+            list_bam:       row.list_bam,
+            batch:          row.batch,
+            param_mpileup:  row.p_mpileup,
+            param_call:     row.p_call
+            list_region:    row.list_region
+        ]   
     }
     | set { meta }
     meta.meta_gt | view { it }
-    meta.list_region | view { it }
     
-    Channel.fromPath( Channel.value(meta.list_region) )
-    | splitText()
-    | view{ it }
+    // Channel.fromPath( Channel.value(meta.list_region) )
+    // | splitText()
+    // | view{ it }
 
     // MPILE_UP_CALL_REGION ( meta_gt, ch_region )
     
