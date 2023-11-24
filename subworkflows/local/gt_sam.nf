@@ -14,7 +14,7 @@ workflow GT_META {
     Channel.fromPath(meta_batch)
     | splitCsv ( header: true, sep: '\t')
     | multiMap { row ->
-        meta:
+        meta_gt:
             [
                 batch:          row.batch,
                 ref:            row.ref,
@@ -37,7 +37,7 @@ workflow GT_META {
     // | view { it }
 
     ch_meta_run = READ_CHR( meta_gt.meta, meta_gt.list_region)
-    ch_meta_run | view { it }
+    ch_meta_run.first() | view { it }
     Channel.fromPath(ch_meta_run)
     | splitCsv ( header: true, sep: '\t')
     | map { row ->

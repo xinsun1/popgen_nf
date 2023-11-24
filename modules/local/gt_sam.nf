@@ -5,11 +5,11 @@ process READ_CHR {
     cpus 1
 
     input:
-    val meta
+    val meta_gt
     val file_region
 
     output:
-    path "${meta.batch}.meta_run.chr", emit: meta_batch
+    path "${meta_gt.batch}.meta_run.chr", emit: meta_batch
     
     when:
     task.ext.when == null || task.ext.when
@@ -27,8 +27,8 @@ process READ_CHR {
     // TODO nf-core: Please replace the example samtools command below with your module's command
     // TODO nf-core: Please indent the command appropriately (4 spaces!!) to help with readability ;)
     """
-    echo 'batch\tref\tlist_bam\tp_mpileup\tp_call\tregion' > ${meta.batch}.meta_run.chr
-    awk '{${meta.batch},${meta.ref}, ${meta.list_bam},${meta.param_mpileup},${meta.param_call},\$1}' OFS='\t' ${file_region} \\
+    echo 'batch\tref\tlist_bam\tp_mpileup\tp_call\tregion' > ${meta_gt.batch}.meta_run.chr
+    awk '{print ${meta_gt.batch},${meta_gt.ref},${meta_gt.list_bam},${meta_gt.param_mpileup},${meta_gt.param_call},\$1}' OFS='\t' ${file_region} \\
         >> ${meta.batch}.meta_run.chr 
     """
 }
