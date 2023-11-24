@@ -44,11 +44,12 @@ workflow GT_META {
                 param_mpileup:  row.p_mpileup,
                 param_call:     row.p_call
             ]
-        list_region:
-            [
-                batch:          row.batch,
-                list_region:    row.list_region
-            ]
+        list_region:    row.list_region
+        // list_region:
+        //     [
+        //         batch:          row.batch,
+        //         list_region:    row.list_region
+        //     ]
     }
     | set { meta_gt }
 
