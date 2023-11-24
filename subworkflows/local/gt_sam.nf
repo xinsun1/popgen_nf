@@ -33,20 +33,20 @@ workflow GT_META {
 
     ch_meta_run = READ_CHR( meta_gt)
     ch_meta_run.meta_batch | view { it }
-    Channel.fromPath(ch_meta_run)
-    | splitCsv ( header: true, sep: '\t')
-    | map { row ->
-        [
-            batch:          row.batch,
-            ref:            row.ref,
-            list_bam:       row.list_bam,
-            param_mpileup:  row.p_mpileup,
-            param_call:     row.p_call,
-            region:         row.region
-        ]
-    }
-    | set { meta_gt_run }
-    meta_gt_run | view{ it }
+    // Channel.fromPath(ch_meta_run)
+    // | splitCsv ( header: true, sep: '\t')
+    // | map { row ->
+    //     [
+    //         batch:          row.batch,
+    //         ref:            row.ref,
+    //         list_bam:       row.list_bam,
+    //         param_mpileup:  row.p_mpileup,
+    //         param_call:     row.p_call,
+    //         region:         row.region
+    //     ]
+    // }
+    // | set { meta_gt_run }
+    // meta_gt_run | view{ it }
     
     // emit:
     // reads                                     // channel: [ val(meta), [ reads ] ]
