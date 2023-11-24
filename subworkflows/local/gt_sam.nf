@@ -36,7 +36,7 @@ workflow GT_META {
     // | splitText()
     // | view { it }
 
-    ch_meta_run = READ_CHR( meta_gt.meta, meta_gt.list_region)
+    ch_meta_run = READ_CHR( meta_gt.meta_gt, meta_gt.list_region)
     ch_meta_run.meta_batch | view { it }
     Channel.fromPath(ch_meta_run)
     | splitCsv ( header: true, sep: '\t')
