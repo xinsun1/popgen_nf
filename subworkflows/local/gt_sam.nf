@@ -16,11 +16,11 @@ workflow GT_META {
     | map { row ->
         [
             batch:          row.batch,
-            ref:            row.ref,
-            list_bam:       row.list_bam,
+            ref:            file(row.ref),
+            list_bam:       file(row.list_bam),
             param_mpileup:  row.p_mpileup,
             param_call:     row.p_call,
-            list_region:    row.list_region
+            list_region:    file(row.list_region)
         ]
     }
     | set { meta_gt }
@@ -31,8 +31,8 @@ workflow GT_META {
     // | splitText()
     // | view { it }
 
-    ch_meta_run = READ_CHR( meta_gt)
-    ch_meta_run.meta_batch | view { it }
+    // ch_meta_run = READ_CHR( meta_gt)
+    // ch_meta_run.meta_batch | view { it }
     // Channel.fromPath(ch_meta_run)
     // | splitCsv ( header: true, sep: '\t')
     // | map { row ->
