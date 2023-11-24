@@ -13,6 +13,11 @@ process MPILE_UP_CALL_REGION {
         'https://depot.galaxyproject.org/singularity/bcftools%3A1.18--h8b25389_0' :
         'bcftools:A1.18--h8b25389_0'}"
 
+    publishDir(
+        path: "${params.publishdir}/gt_chr",
+        mode: 'move',
+    )
+
     input:
     tuple val(meta_gt), val(region)
 
