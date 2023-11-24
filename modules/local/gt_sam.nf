@@ -28,7 +28,12 @@ process READ_CHR {
     // TODO nf-core: Please indent the command appropriately (4 spaces!!) to help with readability ;)
     """
     echo 'batch\tref\tlist_bam\tp_mpileup\tp_call\tregion' > ${meta_gt.batch}.meta_run.chr
-    awk '{print ${meta_gt.batch},${meta_gt.ref},${meta_gt.list_bam},${meta_gt.param_mpileup},${meta_gt.param_call},\$1}' OFS='\t' ${file_region} \\
+    awk '{print "${meta_gt.batch}", \\
+        "${meta_gt.ref}", \\
+        "${meta_gt.list_bam}", \\
+        "${meta_gt.param_mpileup}", \\
+        "${meta_gt.param_call}", \\
+        \$1}' OFS='\t' ${file_region} \\
         >> ${meta_gt.batch}.meta_run.chr 
     """
 }
