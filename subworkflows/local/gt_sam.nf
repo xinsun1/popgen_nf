@@ -23,11 +23,11 @@ workflow GT_META {
         ]
         list_region = row.list_region
     }
-    // | set { batches }
+    | set { meta }
     // batches.view { it }
     
-    ch_region = Channel.fromPath(list_region)
-    ch_region.view{ it }
+    Channel.fromPath(meta.list_region)
+    | view{ it }
 
     // MPILE_UP_CALL_REGION ( meta_gt, ch_region )
     
