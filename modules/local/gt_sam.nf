@@ -29,7 +29,7 @@ process READ_CHR {
     """
     echo 'batch\tref\tlist_bam\tp_mpileup\tp_call\tregion' > ${meta_gt.batch}.meta_run.chr
     awk '{print ${meta_gt.batch},${meta_gt.ref},${meta_gt.list_bam},${meta_gt.param_mpileup},${meta_gt.param_call},\$1}' OFS='\t' ${file_region} \\
-        >> ${meta.batch}.meta_run.chr 
+        >> ${meta_gt.batch}.meta_run.chr 
     """
 }
 
