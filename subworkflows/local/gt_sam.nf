@@ -15,7 +15,7 @@ workflow GT_META {
 
     main:
     Channel.fromPath(meta_batch)
-    | splitCsv ( header: true, sep: '\t')
+    | splitCsv ( header: true, sep: '\t', quote: '"')
     | map { row ->
         meta_gt = [
             batch:          row.batch,
@@ -28,6 +28,7 @@ workflow GT_META {
     | set { meta_gt }
 
     Channel.fromPath(list_region)
+    | splitText()
     | view { it }
     
     
