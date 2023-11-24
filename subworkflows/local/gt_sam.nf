@@ -35,6 +35,7 @@ workflow GT_META {
     ch_meta_region = meta_gt
         .combine(ch_region)
 
+    MPILE_UP_CALL_REGION (ch_meta_region)
     
     
     // emit:
