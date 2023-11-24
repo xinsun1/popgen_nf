@@ -12,12 +12,12 @@ workflow GT_REGION {
     list_region
 
     main:
-    meta_gt | view { it }
-    list_region | view {it}
+    // meta_gt | view { it }
+    // list_region | view {it}
 
-    // Channel.fromPath( meta_gt.list_region )
-    // | splitText()
-    // | view { it }
+    Channel.fromPath( file(list_region) )
+    | splitText()
+    | view { it }
     
 
     // MPILE_UP_CALL_REGION ( meta_gt, ch_region )
