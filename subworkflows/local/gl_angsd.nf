@@ -21,9 +21,9 @@ workflow SMARTPCA_META {
             pop_list: "${row.wdir}/${row.pop_list}"
         ]
         para_meta = [
-            nchr:   row.nchr,
+            nchr: row.nchr,
             lsqprj: row.lsqprj,
-            args:   row.args
+            args: row.args
         ]    
         [row.batch_id, eigen_meta, para_meta]
     }
