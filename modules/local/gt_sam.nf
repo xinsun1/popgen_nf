@@ -1,16 +1,15 @@
-process SMARTPCA_PAR {
+process READ_CHR {
     tag '$batch_id'
     label 'process_local'
     executor 'local'
     cpus 1
 
     input:
-    // [row.batch_id, eigen_meta, para_meta]
-    tuple val(batch_id), val(eigen_meta), val(para_meta)
+    val meta
+    val file_region
 
     output:
-    path "par.${batch_id}", emit: par_file
-    val batch_id, emit: batch_id
+    path "${meta.batch}.meta_run.chr", emit: meta_batch
     
     when:
     task.ext.when == null || task.ext.when
@@ -28,7 +27,9 @@ process SMARTPCA_PAR {
     // TODO nf-core: Please replace the example samtools command below with your module's command
     // TODO nf-core: Please indent the command appropriately (4 spaces!!) to help with readability ;)
     """
-    
+    echo 'batch\tref\tlist_bam\tp_mpileup\tp_call\tregion' > ${meta.batch}.meta_run.chr
+    awk '{${meta.batch},${meta.ref}, ${meta.list_bam},${meta.param_mpileup},${meta.param_call},$1}' ${file_region} \\
+        >> ${meta.batch}.meta_run.chr 
     """
 }
 

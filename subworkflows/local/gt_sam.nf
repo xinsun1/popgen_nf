@@ -4,30 +4,7 @@
 
 nextflow.enable.dsl = 2
 
-include { MPILE_UP_CALL_REGION } from '../../modules/local/gt_sam.nf'
-
-workflow GT_REGION {
-    take:
-    meta_gt
-    list_region
-
-    main:
-    print("a")
-    meta_gt | view { it }
-    list_region | view {it}
-
-    // Channel.fromPath( list_region )
-    // | splitText()
-    // | view { it }
-    
-
-    // MPILE_UP_CALL_REGION ( meta_gt, ch_region )
-    
-
-    // emit:
-    // reads                                     // channel: [ val(meta), [ reads ] ]
-    // versions = SAMPLESHEET_CHECK.out.versions // channel: [ versions.yml ]
-}
+include { MPILE_UP_CALL_REGION, READ_CHR } from '../../modules/local/gt_sam.nf'
 
 workflow GT_META {
     take:
@@ -35,7 +12,7 @@ workflow GT_META {
 
     main:
     Channel.fromPath(meta_batch)
-    | splitCsv ( header: true, sep: '\t', quote: '"')
+    | splitCsv ( header: true, sep: '\t')
     | multiMap { row ->
         meta:
             [
@@ -59,8 +36,22 @@ workflow GT_META {
     // | splitText()
     // | view { it }
 
-    GT_REGION( meta_gt.meta, meta_gt.list_region)
-
+    ch_meta_run = READ_CHR( meta_gt.meta, meta_gt.list_region)
+    Channel.fromPath(ch_meta_run)
+    | splitCsv ( header: true, sep: '\t')
+    | map { row ->
+        [
+            batch:          row.batch,
+            ref:            row.ref,
+            list_bam:       row.list_bam,
+            param_mpileup:  row.p_mpileup,
+            param_call:     row.p_call,
+            region:         row.region
+        ]
+    }
+    | set { meta_gt_run }
+    meta_gt_run | view{ it }
+    
     // emit:
     // reads                                     // channel: [ val(meta), [ reads ] ]
     // versions = SAMPLESHEET_CHECK.out.versions // channel: [ versions.yml ]
