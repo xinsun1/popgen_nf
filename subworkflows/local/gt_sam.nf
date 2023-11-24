@@ -6,19 +6,11 @@ nextflow.enable.dsl = 2
 
 include { MPILE_UP_CALL_REGION; READ_CHR } from '../../modules/local/gt_sam.nf'
 
-workflow GT_REGION {
-    take:
-    file_region
-
-    main:
-    Channel.fromPath( file_region.first() )
-    // | splitText()
-    | view { it }
-}
 
 workflow GT_META {
     take:
     meta_batch
+    list_region
     
 
     main:
@@ -32,33 +24,12 @@ workflow GT_META {
             param_mpileup:  row.p_mpileup,
             param_call:     row.p_call
         ]
-        list_region:    file(row.list_region)
     }
     | set { meta_gt }
 
-    list_region = meta_gt.list_region.first()
-    list_region.view()
     Channel.fromPath( list_region )
-    // | view { it }
-    // // ch_re = Channel.fromPath( file(meta_gt.list_region) )
-    // GT_REGION ( list_region )
-
-    // ch_meta_run = READ_CHR( meta_gt)
-    // ch_meta_run.meta_batch | view { it }
-    // Channel.fromPath(ch_meta_run)
-    // | splitCsv ( header: true, sep: '\t')
-    // | map { row ->
-    //     [
-    //         batch:          row.batch,
-    //         ref:            row.ref,
-    //         list_bam:       row.list_bam,
-    //         param_mpileup:  row.p_mpileup,
-    //         param_call:     row.p_call,
-    //         region:         row.region
-    //     ]
-    // }
-    // | set { meta_gt_run }
-    // meta_gt_run | view{ it }
+    | view { it }
+    
     
     // emit:
     // reads                                     // channel: [ val(meta), [ reads ] ]
@@ -67,6 +38,6 @@ workflow GT_META {
 
 
 workflow {
-    GT_META ( params.meta )
+    GT_META ( params.meta, params.list_region )
 }
 
