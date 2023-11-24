@@ -32,7 +32,7 @@ process READ_CHR {
         "${meta_gt.list_bam}", \\
         "${meta_gt.param_mpileup}", \\
         "${meta_gt.param_call}", \\
-        \$1}' OFS='\t' ${meta_gt.file_region} \\
+        \$1}' OFS='\t' ${meta_gt.list_region} \\
         >> ${meta_gt.batch}.meta_run.chr 
     """
 }
