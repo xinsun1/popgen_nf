@@ -38,6 +38,8 @@ workflow ANGSD_GL {
     GL_CHR (ch_meta_region)
     GL_CLEAN (ch_meta_region)
 
+    meta_gl.first().view()
+
     batch = meta_gl.first().batch
     maf = meta_gl.first().maf
     mis = meta_gl.first().mis
