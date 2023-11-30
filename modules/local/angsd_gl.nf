@@ -3,7 +3,7 @@ process GL_CHR {
     label 'process_medium'
     executor 'slurm'
     cpus 2
-    time '48h'
+    time '1h'
     queue 'cpuqueue'
     memory '4 GB'
     // remember to set executor.perCpuMemAllocation = true in config file
@@ -25,6 +25,7 @@ process GL_CHR {
     path "*.beagle.gz", emit: beagle
     path "*.arg", emit: arg
     path "*.mafs.gz", emit: maf
+    val true, emit: done
 
     when:
     task.ext.when == null || task.ext.when
@@ -41,7 +42,7 @@ process GL_CHR {
     """
     echo "a" >> ${meta_gl.batch}.${region}.beagle.gz
     echo "a" >> ${meta_gl.batch}.${region}.arg
-    echo "a" >> ${meta_gl.batch}.${region}.maf
+    echo "a" >> ${meta_gl.batch}.${region}.mafs.gz
     
 
     cat <<-END_VERSIONS > versions.yml
@@ -56,7 +57,7 @@ process GL_CLEAN {
     label 'process_low'
     executor 'slurm'
     cpus 1
-    time '4h'
+    time '1h'
     queue 'cpuqueue'
     memory '1 GB'
 
@@ -68,6 +69,7 @@ process GL_CLEAN {
     )
 
     input:
+    val ready
     tuple val(meta_gl), val(region)
 
     output:
