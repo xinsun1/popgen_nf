@@ -56,7 +56,7 @@ process GL_CHR {
     """
 }
 
-process GL_CLEAN {
+process GL_FILTER {
     tag '$batch_id'
     label 'process_low'
     // executor 'slurm'
@@ -83,9 +83,9 @@ process GL_CLEAN {
     val mis
 
     output:
-    path "${batch}.${region}.is_tv_maf${maf}_mis${mis}", emit: is_f
+    val "${batch}.${region}.is_tv_maf${maf}_mis${mis}", emit: is_f
     val "${batch}.${region}.tv_maf${maf}_mis${mis}.beagle", emit: beagle
-    path "${batch}.${region}.tv_maf${maf}_mis${mis}.mafs", emit: maf
+    val "${batch}.${region}.tv_maf${maf}_mis${mis}.mafs", emit: maf
     val true, emit: done
 
     when:
@@ -137,55 +137,29 @@ process GL_CLEAN {
     """
 }
 
-process GL_MERGE {
+process GL_CLEAN {
     tag '$batch_id'
     label 'process_medium'
-    executor 'slurm'
-    cpus 2
-    time '48h'
-    queue 'cpuqueue'
-    memory '4 GB'
+    executor 'local'
+    cpus 1
+    time '2h'
     // remember to set executor.perCpuMemAllocation = true in config file
 
-
-    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/angsd%3A0.940--hce60e53_2' :
-        'angsd:0.940--hce60e53_2'}"
-
-    publishDir(
-        path: "${params.wdir}gl_chr",
-        mode: 'move',
-    )
-
     input:
-    tuple val(meta_gl), val(region)
-
-    output:
-    path "*.beagle.gz", emit: beagle
-    path "*.arg", emit: arg
-    path "*.mafs.gz", emit: maf
-
+    val ready
+    path file
+    
     when:
     task.ext.when == null || task.ext.when
 
     script:
     def args = task.ext.args ?: ''
     """
-    cat gl_chr1_tv_maf05_mis50.beagle >> $WDIR/gl_tv_maf05_mis50.beagle
-    cat gl_chr1_tv_maf05_mis50.mafs >> $WDIR/gl_tv_maf05_mis50.mafs
-    for i in {2..38}
-    do
-            tail -n +2 gl_chr${i}_tv_maf05_mis50.beagle >> $WDIR/gl_tv_maf05_mis50.beagle
-            tail -n +2 gl_chr${i}_tv_maf05_mis50.mafs >> $WDIR/gl_tv_maf05_mis50.mafs
-    done
+    rm -fr ${file}
 
-    gzip $WDIR/gl_tv_maf05_mis50.beagle &
-    gzip $WDIR/gl_tv_maf05_mis50.mafs &
-    wait
-    
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        : \$(echo \$(angsd))
+        : \$(echo \$(bash -version))
     END_VERSIONS
     """
 }

@@ -25,7 +25,7 @@ workflow ANGSD_GL {
         )
 
     // filter gl per region
-    ch_gl_clean = GL_CLEAN (
+    ch_gl_clean = GL_FILTER (
         ch_gl_chr.done,         // val ready
         params.batch,           // val batch
         file(params.list_bam),  // path list_bam
@@ -35,7 +35,7 @@ workflow ANGSD_GL {
         params.mis,             // val mis
     )
     // merge output
-    ch_gl_collect = ch_gl_clean.beagle
+    ch_gl_collect_bg = ch_gl_clean.beagle
         .map {it -> file("${params.wdir}gl_chr/${it}")}
         .collectFile(
             name: "${params.batch}.tv_maf${params.maf}_mis${params.mis}.beagle",
@@ -43,20 +43,28 @@ workflow ANGSD_GL {
             //keepHeader: true,
             //skip: 1,
             sort: false)
-    
-    
-    // ch_region 
-    // | map {it ->
-    //         "${params.wdir}gl_chr/${meta_gl_first.batch}.${it}.tv_maf${meta_gl_first.maf}_mis${meta_gl_first.mis}.beagle"}
-    // | view()
+    ch_gl_collect_maf = ch_gl_clean.maf
+        .map {it -> file("${params.wdir}gl_chr/${it}")}
+        .collectFile(
+            name: "${params.batch}.tv_maf${params.maf}_mis${params.mis}.mafs",
+            storeDir: params.wdir,
+            //keepHeader: true,
+            //skip: 1,
+            sort: false)
 
-//     | collectFile("${meta_gl_first.batch}.tv_maf${meta_gl_first.maf}_mis${meta_gl_first.mis}.beagle",
-//             storeDir: params.wdir,
-//             keepHeader: true,
-//             skip: 1,
-//             sort: false)
-// 
+    
+    // clean directory
+    GL_CLEAN (
+        ch_gl_collect_bg,
+        ch_gl_clean.beagle
+            .map {it -> file("${params.wdir}gl_chr/${it}")}
+    )
 
+    GL_CLEAN (
+        ch_gl_collect_maf,
+        ch_gl_clean.maf
+            .map {it -> file("${params.wdir}gl_chr/${it}")}
+    )
 
     
     // emit:
