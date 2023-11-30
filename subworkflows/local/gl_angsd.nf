@@ -4,7 +4,7 @@
 
 nextflow.enable.dsl = 2
 
-include { GL_CHR; GL_CLEAN; } from '../../modules/local/angsd_gl.nf'
+include { GL_CHR; GL_CLEAN; GL_FILTER; } from '../../modules/local/angsd_gl.nf'
 
 workflow ANGSD_GL {
     take:
