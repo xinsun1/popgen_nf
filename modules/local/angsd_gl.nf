@@ -4,7 +4,7 @@ process GL_CHR {
     executor 'slurm'
     // executor 'local'
     cpus 2
-    time '72h'
+    time '24h'
     queue 'cpuqueue'
     memory '16 GB'
     // remember to set executor.perCpuMemAllocation = true in config file
