@@ -19,7 +19,7 @@ workflow ANGSD_GL {
     
     GL_CHR (
         params.batch,
-        path(params.list_bam),
+        file(params.list_bam),
         ch_region, params.gl_param
         )
 
