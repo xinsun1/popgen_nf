@@ -42,13 +42,14 @@ workflow ANGSD_GL {
     maf = meta_gl.first().maf
     mis = meta_gl.first().mis
     
-    ch_region
-    | map {it -> "${params.wdir}gl_chr/${batch}.${it}.tv_maf${maf}_mis${mis}.beagle"}
-    | collectFile("${batch}.tv_maf${maf}_mis${mis}.beagle",
-        storeDir: params.wdir,
-        keepHeader: true,
-        skip: 1,
-        sort: false)
+    ch_region \
+        | map {it ->
+            "${params.wdir}gl_chr/${batch}.${it}.tv_maf${maf}_mis${mis}.beagle"} \
+        | collectFile("${batch}.tv_maf${maf}_mis${mis}.beagle",
+            storeDir: params.wdir,
+            keepHeader: true,
+            skip: 1,
+            sort: false)
 
 
 
