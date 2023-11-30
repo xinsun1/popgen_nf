@@ -43,9 +43,9 @@ workflow ANGSD_GL {
     mis = meta_gl.first().mis
     
     ch_region 
-        .map {it ->
+    | map {it ->
             "${params.wdir}gl_chr/${batch}.${it}.tv_maf${maf}_mis${mis}.beagle"} \
-        .collectFile("${batch}.tv_maf${maf}_mis${mis}.beagle",
+    | collectFile("${batch}.tv_maf${maf}_mis${mis}.beagle",
             storeDir: params.wdir,
             keepHeader: true,
             skip: 1,
