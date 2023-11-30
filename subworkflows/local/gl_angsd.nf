@@ -19,7 +19,10 @@ workflow ANGSD_GL {
         meta_gl = [
             batch:          row.BATCH,
             list_bam:       file(row.LIST_BAM),
-            param_gl:  row.GL_PARA
+            param_gl:       row.GL_PARA,
+            n:              row.n,
+            maf:            row.maf,
+            mis:            row.mis
         ]
     }
     | set { meta_gl }
@@ -36,8 +39,8 @@ workflow ANGSD_GL {
     ch_clean = GL_CLEAN (ch_meta_region)
 
     batch = meta_gl.first().batch
-    
 
+    
     ch_clean.beagle
         .collectFile(batch, storeDir: params.wdir, )
 
