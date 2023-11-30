@@ -35,8 +35,15 @@ workflow ANGSD_GL {
         params.mis,             // val mis
     )
     // merge output
-    ch_gl_clean.beagle
-        .view()
+    ch_gl_collect = ch_gl_clean.beagle
+        .map {it -> file("${params.wdir}gl_chr/${it}")}
+        .collectFile(
+            name: "${params.batch}.tv_maf${params.maf}_mis${params.mis}.beagle",
+            storeDir: params.wdir,
+            //keepHeader: true,
+            //skip: 1,
+            sort: false)
+    
     
     // ch_region 
     // | map {it ->
