@@ -4,7 +4,7 @@
 
 nextflow.enable.dsl = 2
 
-include { GL_CHR; } from '../../modules/local/angsd_gl.nf'
+include { GL_CHR; GL_CLEAN; } from '../../modules/local/angsd_gl.nf'
 
 workflow ANGSD_GL {
     take:
@@ -20,9 +20,9 @@ workflow ANGSD_GL {
             batch:          row.BATCH,
             list_bam:       file(row.LIST_BAM),
             param_gl:       row.GL_PARA,
-            n:              row.n,
-            maf:            row.maf,
-            mis:            row.mis
+            n:              row.N,
+            maf:            row.MAF,
+            mis:            row.MIS
         ]
     }
     | set { meta_gl }
@@ -36,13 +36,19 @@ workflow ANGSD_GL {
         .combine(ch_region)
 
     GL_CHR (ch_meta_region)
-    ch_clean = GL_CLEAN (ch_meta_region)
+    GL_CLEAN (ch_meta_region)
 
     batch = meta_gl.first().batch
-
+    maf = meta_gl.first().maf
+    mis = meta_gl.first().mis
     
-    ch_clean.beagle
-        .collectFile(batch, storeDir: params.wdir, )
+    ch_region
+    | map {it -> "${params.wdir}gl_chr/${batch}.${it}.tv_maf${maf}_mis${mis}.beagle"}
+    | collectFile("${batch}.tv_maf${maf}_mis${mis}.beagle",
+        storeDir: params.wdir,
+        keepHeader: true,
+        skip: 1,
+        sort: false)
 
 
 

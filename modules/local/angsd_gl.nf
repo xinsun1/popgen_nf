@@ -71,9 +71,9 @@ process GL_CLEAN {
     tuple val(meta_gl), val(region)
 
     output:
-    path '${meta_gl.batch}.${region}.is_tv_maf${meta_gl.maf}_mis${meta_gl.mis}', emit: is_f
-    path '${meta_gl.batch}.${region}.tv_maf${meta_gl.maf}_mis${meta_gl.mis}.beagle', emit: beagle
-    path '${meta_gl.batch}.${region}.tv_maf${meta_gl.maf}_mis${meta_gl.mis}.mafs', emit: maf
+    path "${meta_gl.batch}.${region}.is_tv_maf${meta_gl.maf}_mis${meta_gl.mis}", emit: is_f
+    path "${meta_gl.batch}.${region}.tv_maf${meta_gl.maf}_mis${meta_gl.mis}.beagle", emit: beagle
+    path "${meta_gl.batch}.${region}.tv_maf${meta_gl.maf}_mis${meta_gl.mis}.mafs", emit: maf
 
     when:
     task.ext.when == null || task.ext.when
