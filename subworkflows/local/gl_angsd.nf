@@ -17,15 +17,23 @@ workflow ANGSD_GL {
       .splitText()
       .map{it -> it.trim()}
     
-    GL_CHR (
+    ch_gl_chr = GL_CHR (
         params.batch,
         file(params.list_bam),
-        ch_region, params.gl_param
+        ch_region,
+        params.gl_param
         )
 
-
     // filter gl per region
-
+    ch_gl_clean = GL_CLEAN (
+        ch_gl_chr.done,         // val ready
+        params.batch,           // val batch
+        file(params.list_bam),  // path list_bam
+        ch_region,              // val region
+        params.maf,             // val maf
+        params.n,               // val n
+        params.mis,             // val mis
+    )
     // merge output
 
     // ch_gl = GL_CHR (ch_meta_region)

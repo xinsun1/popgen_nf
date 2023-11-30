@@ -76,7 +76,6 @@ process GL_CLEAN {
     val batch
     path list_bam
     val region
-    val param_gl
     val maf
     val n
     val mis
@@ -124,8 +123,8 @@ process GL_CLEAN {
     //         > ${batch}.${region}.tv_maf${maf}_mis${mis}.mafs
     
     """
-    echo "a" > ${batch}.${region}.is_tv_maf${maf}_mis${mis}
-    echo "b" > ${batch}.${region}.tv_maf${maf}_mis${mis}.beagle
+    echo "${n}" > ${batch}.${region}.is_tv_maf${maf}_mis${mis}
+    echo "${n}" > ${batch}.${region}.tv_maf${maf}_mis${mis}.beagle
     echo "c" > ${batch}.${region}.tv_maf${maf}_mis${mis}.mafs
 
     
