@@ -1,12 +1,12 @@
 process GL_CHR {
     tag '$batch_id'
     label 'process_medium'
-    //executor 'slurm'
-    executor 'local'
+    executor 'slurm'
+    // executor 'local'
     cpus 2
-    time '1h'
+    time '72h'
     queue 'cpuqueue'
-    memory '4 GB'
+    memory '16 GB'
     // remember to set executor.perCpuMemAllocation = true in config file
 
 
@@ -36,18 +36,15 @@ process GL_CHR {
 
     script:
     def args = task.ext.args ?: ''
-    // angsd -remove_bads 1 -uniqueOnly 1 \\
-    //     -out ${batch}.${region} \\
-    //     ${param_gl} \\
-    //     -nThreads 2 \\
-    //     -bam ${list_bam} \\
-    //     -r ${region}
+    
     
     """
-    echo "${region}" >> ${batch}.${region}.beagle.gz
-    echo "${batch}" >> ${batch}.${region}.arg
-    echo "${param_gl}" >> ${batch}.${region}.mafs.gz
-    
+    angsd -remove_bads 1 -uniqueOnly 1 \\
+        -out ${batch}.${region} \\
+        ${param_gl} \\
+        -nThreads 2 \\
+        -bam ${list_bam} \\
+        -r ${region}
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
@@ -59,8 +56,8 @@ process GL_CHR {
 process GL_FILTER {
     tag '$batch_id'
     label 'process_low'
-    // executor 'slurm'
-    executor 'local'
+    executor 'slurm'
+    // executor 'local'
     cpus 1
     time '1h'
     queue 'cpuqueue'
@@ -93,43 +90,39 @@ process GL_FILTER {
 
     script:
     def args = task.ext.args ?: ''
-    // zcat ${batch}.${region}.mafs.gz | \\
-    //     awk '{\\
-    //         if(NR==1){print 1}\\
-    //         else{if(\\
-    //         (\$3=="A" && \$4=="G") || \\
-    //         (\$3=="T" && \$4=="C") || \\
-    //         (\$3=="C" && \$4=="T") || \\
-    //         (\$3=="G" && \$4=="A") || \\
-    //         \$5 < (${maf}/100) || \\
-    //         \$5 > ((1-${maf})/100) || \\
-    //         \$7/${n} < (${mis}/100)\\
-    //         ){print 0}\\
-    //         else{print 1}\\
-    //         }}' \\
-    //         > ${batch}.${region}.is_tv_maf${maf}_mis${mis}
-    // zcat ${batch}.${region}.beagle.gz | \\
-    //     awk 'NR==FNR \\
-    //         {a[FNR]=\$1} \\
-    //         NR != FNR \\
-    //         {if(a[FNR]==1){print \$0}}' \\
-    //         ${batch}.${region}.is_tv_maf${maf}_mis${mis} \\
-    //         - \\
-    //         > ${batch}.${region}.tv_maf${maf}_mis${mis}.beagle
-    // zcat ${batch}.${region}.mafs.gz | \\
-    //     awk 'NR==FNR {a[FNR]=\$1} \\
-    //         NR != FNR \\
-    //         {if(a[FNR]==1){print \$0}}' \\
-    //         ${batch}.${region}.is_tv_maf${maf}_mis${mis} \\
-    //         - \\
-    //         > ${batch}.${region}.tv_maf${maf}_mis${mis}.mafs
     
     """
-    echo "${n}" > ${batch}.${region}.is_tv_maf${maf}_mis${mis}
-    echo "${n}" > ${batch}.${region}.tv_maf${maf}_mis${mis}.beagle
-    echo "c" > ${batch}.${region}.tv_maf${maf}_mis${mis}.mafs
+    zcat ${batch}.${region}.mafs.gz | \\
+        awk '{\\
+            if(NR==1){print 1}\\
+            else{if(\\
+            (\$3=="A" && \$4=="G") || \\
+            (\$3=="T" && \$4=="C") || \\
+            (\$3=="C" && \$4=="T") || \\
+            (\$3=="G" && \$4=="A") || \\
+            \$5 < (${maf}/100) || \\
+            \$5 > ((1-${maf})/100) || \\
+            \$7/${n} < (${mis}/100)\\
+            ){print 0}\\
+            else{print 1}\\
+            }}' \\
+            > ${batch}.${region}.is_tv_maf${maf}_mis${mis}
+    zcat ${batch}.${region}.beagle.gz | \\
+        awk 'NR==FNR \\
+            {a[FNR]=\$1} \\
+            NR != FNR \\
+            {if(a[FNR]==1){print \$0}}' \\
+            ${batch}.${region}.is_tv_maf${maf}_mis${mis} \\
+            - \\
+            > ${batch}.${region}.tv_maf${maf}_mis${mis}.beagle
+    zcat ${batch}.${region}.mafs.gz | \\
+        awk 'NR==FNR {a[FNR]=\$1} \\
+            NR != FNR \\
+            {if(a[FNR]==1){print \$0}}' \\
+            ${batch}.${region}.is_tv_maf${maf}_mis${mis} \\
+            - \\
+            > ${batch}.${region}.tv_maf${maf}_mis${mis}.mafs
 
-    
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         : \$(echo bash))
