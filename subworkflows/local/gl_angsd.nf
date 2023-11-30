@@ -35,11 +35,8 @@ workflow ANGSD_GL {
         params.mis,             // val mis
     )
     // merge output
-
-    // ch_gl = GL_CHR (ch_meta_region)
-    // GL_CLEAN (ch_gl.done, ch_meta_region)
-
-    // meta_gl_first = meta_gl.first().value
+    ch_gl_clean.beagle
+        .view()
     
     // ch_region 
     // | map {it ->
