@@ -43,9 +43,9 @@ process GL_CHR {
     //     -r ${region}
     
     """
-    echo "a" >> ${batch}.${region}.beagle.gz
-    echo "a" >> ${batch}.${region}.arg
-    echo "a" >> ${batch}.${region}.mafs.gz
+    echo "${region}" >> ${batch}.${region}.beagle.gz
+    echo "${batch}" >> ${batch}.${region}.arg
+    echo "${param_gl}" >> ${batch}.${region}.mafs.gz
     
 
     cat <<-END_VERSIONS > versions.yml
