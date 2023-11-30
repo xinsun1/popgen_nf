@@ -146,8 +146,10 @@ process GL_CLEAN {
     // remember to set executor.perCpuMemAllocation = true in config file
 
     input:
-    val ready
-    path file
+    val ready_bg
+    val ready_maf
+    val name_bg
+    val name_maf
     
     when:
     task.ext.when == null || task.ext.when
@@ -155,7 +157,8 @@ process GL_CLEAN {
     script:
     def args = task.ext.args ?: ''
     """
-    rm -fr ${file}
+    rm -fr ${params.wdir}gl_chr/${name_bg}
+    rm -fr ${params.wdir}gl_chr/${name_maf}
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
