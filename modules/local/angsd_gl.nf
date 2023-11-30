@@ -1,74 +1,30 @@
-process SMARTPCA_PAR {
+process GL_CHR {
     tag '$batch_id'
-    label 'process_local'
-    executor 'local'
-    cpus 1
-
-    input:
-    // [row.batch_id, eigen_meta, para_meta]
-    tuple val(batch_id), val(eigen_meta), val(para_meta)
-
-    output:
-    path "par.${batch_id}", emit: par_file
-    val batch_id, emit: batch_id
-    
-    when:
-    task.ext.when == null || task.ext.when
-
-    script:
-    def args = task.ext.args ?: ''
-    
-    // TODO nf-core: Where possible, a command MUST be provided to obtain the version number of the software e.g. 1.10
-    //               If the software is unable to output a version number on the command-line then it can be manually specified
-    //               e.g. https://github.com/nf-core/modules/blob/master/modules/nf-core/homer/annotatepeaks/main.nf
-    //               Each software used MUST provide the software name and version number in the YAML version file (versions.yml)
-    // TODO nf-core: It MUST be possible to pass additional parameters to the tool as a command-line string via the "task.ext.args" directive
-    // TODO nf-core: If the tool supports multi-threading then you MUST provide the appropriate parameter
-    //               using the Nextflow "task" variable e.g. "--threads $task.cpus"
-    // TODO nf-core: Please replace the example samtools command below with your module's command
-    // TODO nf-core: Please indent the command appropriately (4 spaces!!) to help with readability ;)
-    """
-    echo '
-genotypename:   ${eigen_meta.geno}
-snpname:        ${eigen_meta.snp}
-indivname:      ${eigen_meta.ind}
-poplistname:    ${eigen_meta.pop_list}
-evecoutname:    ${batch_id}.evec
-evaloutname:    ${batch_id}.eval
-lsqproject:     ${para_meta.lsqprj}
-numthreads:     ${task.cpus}
-numchrom:       ${para_meta.nchr}
-threads:        4
-numoutlieriter: 0' > par.${batch_id}
-    echo '${para_meta.args}' >> par.${batch_id}
-    """
-}
-
-process SMARTPCA {
-    tag '$batch_id'
-    label 'process_light'
+    label 'process_medium'
     executor 'slurm'
-    cpus 4
-    time '6h'
+    cpus 2
+    time '48h'
     queue 'cpuqueue'
-    memory '16 GB'
+    memory '4 GB'
     // remember to set executor.perCpuMemAllocation = true in config file
 
 
-    // container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-    //     'https://depot.galaxyproject.org/singularity/eigensoft%3A8.0.0--h6a739c9_3' :
-    //     'eigensoft:8.0.0--h6a739c9_3'}"
+    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+        'https://depot.galaxyproject.org/singularity/angsd%3A0.940--hce60e53_2' :
+        'angsd:0.940--hce60e53_2'}"
 
-    container "/maps/projects/mjolnir1/people/gnr216/a-software/sigularity_module/eigensoft:8.0.0--h6a739c9_3"
+    publishDir(
+        path: "${params.wdir}gl_chr",
+        mode: 'move',
+    )
 
     input:
-    path par_file
-    val batch_id
+    tuple val(meta_gl), val(region)
 
     output:
-    path "*.evec", emit: evalout
-    path "*.evec", emit: evecout
-    path "log.*", emit: log_pca
+    path "*.beagle.gz", emit: beagle
+    path "*.arg", emit: arg
+    path "*.mafs.gz", emit: maf
 
     when:
     task.ext.when == null || task.ext.when
@@ -76,13 +32,142 @@ process SMARTPCA {
     script:
     def args = task.ext.args ?: ''
     """
-    smartpca \\
-        -p ${par_file} \\
-        > log.${batch_id}
+    angsd -remove_bads 1 -uniqueOnly 1 \\
+        -out ${meta_gl.batch}.${region} \\
+        ${meta_gl.param_gl} \\
+        -nThreads 2 \\
+        -bam ${meta_gl.list_bam} \\
+        -r ${region}
     
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        : \$(echo \$(smartpca) | sed 's/^.*version: //; s/Using.*\$//' ))
+        : \$(echo \$(angsd))
     END_VERSIONS
     """
 }
+
+process GL_CLEAN {
+    tag '$batch_id'
+    label 'process_low'
+    executor 'slurm'
+    cpus 1
+    time '4h'
+    queue 'cpuqueue'
+    memory '1 GB'
+
+    // remember to set executor.perCpuMemAllocation = true in config file
+    
+    publishDir(
+        path: "${params.wdir}gl_chr",
+        mode: 'move',
+    )
+
+    input:
+    tuple val(meta_gl), val(region)
+
+    output:
+    path '${meta_gl.batch}.${region}.is_tv_maf${meta_gl.maf}_mis${meta_gl.mis}', emit: beagle
+    path '${meta_gl.batch}.${region}.tv_maf${meta_gl.maf}_mis${meta_gl.mis}.beagle', emit: arg
+    path '${meta_gl.batch}.${region}.tv_maf${meta_gl.maf}_mis${meta_gl.mis}.mafs', emit: maf
+
+    when:
+    task.ext.when == null || task.ext.when
+
+    script:
+    def args = task.ext.args ?: ''
+    """
+    // ${meta_gl.maf}
+    // ${meta_gl.mis}
+    // ${meta_gl.n}
+    zcat ${meta_gl.batch}.${region}.mafs.gz | \\
+        awk '{\\
+            if(NR==1){print 1}\\
+            else{if(\\
+            (\$3=="A" && \$4=="G") || \\
+            (\$3=="T" && \$4=="C") || \\
+            (\$3=="C" && \$4=="T") || \\
+            (\$3=="G" && \$4=="A") || \\
+            \$5 < (${meta_gl.maf}/100) || \\
+            \$5 > ((1-${meta_gl.maf})/100) || \\
+            \$7/${meta_gl.n} < (${meta_gl.mis}/100)\\
+            ){print 0}\\
+            else{print 1}\\
+            }}' \\
+            > ${meta_gl.batch}.${region}.is_tv_maf${meta_gl.maf}_mis${meta_gl.mis}
+    zcat ${meta_gl.batch}.${region}.beagle.gz | \\
+        awk 'NR==FNR \\
+            {a[FNR]=\$1} \\
+            NR != FNR \\
+            {if(a[FNR]==1){print \$0}}' \\
+            ${meta_gl.batch}.${region}.is_tv_maf${meta_gl.maf}_mis${meta_gl.mis} \\
+            - \\
+            > ${meta_gl.batch}.${region}.tv_maf${meta_gl.maf}_mis${meta_gl.mis}.beagle
+    zcat ${meta_gl.batch}.${region}.mafs.gz | \\
+        awk 'NR==FNR {a[FNR]=\$1} \\
+            NR != FNR \\
+            {if(a[FNR]==1){print \$0}}' \\
+            ${meta_gl.batch}.${region}.is_tv_maf${meta_gl.maf}_mis${meta_gl.mis} \\
+            - \\
+            > ${meta_gl.batch}.${region}.tv_maf${meta_gl.maf}_mis${meta_gl.mis}.mafs
+    
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        : \$(echo bash))
+    END_VERSIONS
+    """
+}
+
+process GL_MERGE {
+    tag '$batch_id'
+    label 'process_medium'
+    executor 'slurm'
+    cpus 2
+    time '48h'
+    queue 'cpuqueue'
+    memory '4 GB'
+    // remember to set executor.perCpuMemAllocation = true in config file
+
+
+    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+        'https://depot.galaxyproject.org/singularity/angsd%3A0.940--hce60e53_2' :
+        'angsd:0.940--hce60e53_2'}"
+
+    publishDir(
+        path: "${params.wdir}gl_chr",
+        mode: 'move',
+    )
+
+    input:
+    tuple val(meta_gl), val(region)
+
+    output:
+    path "*.beagle.gz", emit: beagle
+    path "*.arg", emit: arg
+    path "*.mafs.gz", emit: maf
+
+    when:
+    task.ext.when == null || task.ext.when
+
+    script:
+    def args = task.ext.args ?: ''
+    """
+    cat gl_chr1_tv_maf05_mis50.beagle >> $WDIR/gl_tv_maf05_mis50.beagle
+cat gl_chr1_tv_maf05_mis50.mafs >> $WDIR/gl_tv_maf05_mis50.mafs
+for i in {2..38}
+do
+        tail -n +2 gl_chr${i}_tv_maf05_mis50.beagle >> $WDIR/gl_tv_maf05_mis50.beagle
+        tail -n +2 gl_chr${i}_tv_maf05_mis50.mafs >> $WDIR/gl_tv_maf05_mis50.mafs
+done
+
+gzip $WDIR/gl_tv_maf05_mis50.beagle &
+gzip $WDIR/gl_tv_maf05_mis50.mafs &
+wait
+    
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        : \$(echo \$(angsd))
+    END_VERSIONS
+    """
+}
+
+
