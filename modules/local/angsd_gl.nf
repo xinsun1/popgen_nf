@@ -19,12 +19,15 @@ process GL_CHR {
     )
 
     input:
-    tuple val(meta_gl), val(region)
+    val batch
+    path list_bam
+    val region
+    val param_gl
 
     output:
-    path "*.beagle.gz", emit: beagle
+    path "*.beagle.gz", emit: beagle_gz
     path "*.arg", emit: arg
-    path "*.mafs.gz", emit: maf
+    path "*.mafs.gz", emit: maf_gz
     val true, emit: done
 
     when:
@@ -33,16 +36,16 @@ process GL_CHR {
     script:
     def args = task.ext.args ?: ''
     // angsd -remove_bads 1 -uniqueOnly 1 \\
-    //     -out ${meta_gl.batch}.${region} \\
-    //     ${meta_gl.param_gl} \\
+    //     -out ${batch}.${region} \\
+    //     ${param_gl} \\
     //     -nThreads 2 \\
-    //     -bam ${meta_gl.list_bam} \\
+    //     -bam ${list_bam} \\
     //     -r ${region}
     
     """
-    echo "a" >> ${meta_gl.batch}.${region}.beagle.gz
-    echo "a" >> ${meta_gl.batch}.${region}.arg
-    echo "a" >> ${meta_gl.batch}.${region}.mafs.gz
+    echo "a" >> ${batch}.${region}.beagle.gz
+    echo "a" >> ${batch}.${region}.arg
+    echo "a" >> ${batch}.${region}.mafs.gz
     
 
     cat <<-END_VERSIONS > versions.yml
@@ -70,19 +73,26 @@ process GL_CLEAN {
 
     input:
     val ready
-    tuple val(meta_gl), val(region)
+    val batch
+    path list_bam
+    val region
+    val param_gl
+    val maf
+    val n
+    val mis
 
     output:
-    path "${meta_gl.batch}.${region}.is_tv_maf${meta_gl.maf}_mis${meta_gl.mis}", emit: is_f
-    path "${meta_gl.batch}.${region}.tv_maf${meta_gl.maf}_mis${meta_gl.mis}.beagle", emit: beagle
-    path "${meta_gl.batch}.${region}.tv_maf${meta_gl.maf}_mis${meta_gl.mis}.mafs", emit: maf
+    path "${batch}.${region}.is_tv_maf${maf}_mis${mis}", emit: is_f
+    path "${batch}.${region}.tv_maf${maf}_mis${mis}.beagle", emit: beagle
+    path "${batch}.${region}.tv_maf${maf}_mis${mis}.mafs", emit: maf
+    val true, emit: done
 
     when:
     task.ext.when == null || task.ext.when
 
     script:
     def args = task.ext.args ?: ''
-    // zcat ${meta_gl.batch}.${region}.mafs.gz | \\
+    // zcat ${batch}.${region}.mafs.gz | \\
     //     awk '{\\
     //         if(NR==1){print 1}\\
     //         else{if(\\
@@ -90,33 +100,33 @@ process GL_CLEAN {
     //         (\$3=="T" && \$4=="C") || \\
     //         (\$3=="C" && \$4=="T") || \\
     //         (\$3=="G" && \$4=="A") || \\
-    //         \$5 < (${meta_gl.maf}/100) || \\
-    //         \$5 > ((1-${meta_gl.maf})/100) || \\
-    //         \$7/${meta_gl.n} < (${meta_gl.mis}/100)\\
+    //         \$5 < (${maf}/100) || \\
+    //         \$5 > ((1-${maf})/100) || \\
+    //         \$7/${n} < (${mis}/100)\\
     //         ){print 0}\\
     //         else{print 1}\\
     //         }}' \\
-    //         > ${meta_gl.batch}.${region}.is_tv_maf${meta_gl.maf}_mis${meta_gl.mis}
-    // zcat ${meta_gl.batch}.${region}.beagle.gz | \\
+    //         > ${batch}.${region}.is_tv_maf${maf}_mis${mis}
+    // zcat ${batch}.${region}.beagle.gz | \\
     //     awk 'NR==FNR \\
     //         {a[FNR]=\$1} \\
     //         NR != FNR \\
     //         {if(a[FNR]==1){print \$0}}' \\
-    //         ${meta_gl.batch}.${region}.is_tv_maf${meta_gl.maf}_mis${meta_gl.mis} \\
+    //         ${batch}.${region}.is_tv_maf${maf}_mis${mis} \\
     //         - \\
-    //         > ${meta_gl.batch}.${region}.tv_maf${meta_gl.maf}_mis${meta_gl.mis}.beagle
-    // zcat ${meta_gl.batch}.${region}.mafs.gz | \\
+    //         > ${batch}.${region}.tv_maf${maf}_mis${mis}.beagle
+    // zcat ${batch}.${region}.mafs.gz | \\
     //     awk 'NR==FNR {a[FNR]=\$1} \\
     //         NR != FNR \\
     //         {if(a[FNR]==1){print \$0}}' \\
-    //         ${meta_gl.batch}.${region}.is_tv_maf${meta_gl.maf}_mis${meta_gl.mis} \\
+    //         ${batch}.${region}.is_tv_maf${maf}_mis${mis} \\
     //         - \\
-    //         > ${meta_gl.batch}.${region}.tv_maf${meta_gl.maf}_mis${meta_gl.mis}.mafs
+    //         > ${batch}.${region}.tv_maf${maf}_mis${mis}.mafs
     
     """
-    echo "a" > ${meta_gl.batch}.${region}.is_tv_maf${meta_gl.maf}_mis${meta_gl.mis}
-    echo "b" > ${meta_gl.batch}.${region}.tv_maf${meta_gl.maf}_mis${meta_gl.mis}.beagle
-    echo "c" > ${meta_gl.batch}.${region}.tv_maf${meta_gl.maf}_mis${meta_gl.mis}.mafs
+    echo "a" > ${batch}.${region}.is_tv_maf${maf}_mis${mis}
+    echo "b" > ${batch}.${region}.tv_maf${maf}_mis${mis}.beagle
+    echo "c" > ${batch}.${region}.tv_maf${maf}_mis${mis}.mafs
 
     
     cat <<-END_VERSIONS > versions.yml

@@ -17,6 +17,12 @@ workflow ANGSD_GL {
       .splitText()
       .map{it -> it.trim()}
     
+    GL_CHR (
+        params.batch,
+        path(params.list_bam),
+        ch_region, params.gl_param
+        )
+
 
     // filter gl per region
 
@@ -25,12 +31,12 @@ workflow ANGSD_GL {
     // ch_gl = GL_CHR (ch_meta_region)
     // GL_CLEAN (ch_gl.done, ch_meta_region)
 
-    meta_gl_first = meta_gl.first().value
+    // meta_gl_first = meta_gl.first().value
     
-    ch_region 
-    | map {it ->
-            "${params.wdir}gl_chr/${meta_gl_first.batch}.${it}.tv_maf${meta_gl_first.maf}_mis${meta_gl_first.mis}.beagle"}
-    | view()
+    // ch_region 
+    // | map {it ->
+    //         "${params.wdir}gl_chr/${meta_gl_first.batch}.${it}.tv_maf${meta_gl_first.maf}_mis${meta_gl_first.mis}.beagle"}
+    // | view()
 
 //     | collectFile("${meta_gl_first.batch}.tv_maf${meta_gl_first.maf}_mis${meta_gl_first.mis}.beagle",
 //             storeDir: params.wdir,
