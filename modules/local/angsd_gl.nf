@@ -1,7 +1,8 @@
 process GL_CHR {
     tag '$batch_id'
     label 'process_medium'
-    executor 'slurm'
+    //executor 'slurm'
+    executor 'local'
     cpus 2
     time '1h'
     queue 'cpuqueue'
@@ -58,7 +59,8 @@ process GL_CHR {
 process GL_CLEAN {
     tag '$batch_id'
     label 'process_low'
-    executor 'slurm'
+    // executor 'slurm'
+    executor 'local'
     cpus 1
     time '1h'
     queue 'cpuqueue'
