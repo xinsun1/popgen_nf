@@ -59,5 +59,5 @@ workflow ANGSD_GL {
 }
 
 workflow {
-    ANGSD_GL ( params.meta )
+    ANGSD_GL ( params.meta, params.list_region )
 }
