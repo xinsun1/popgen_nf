@@ -50,15 +50,17 @@ workflow ANGSD_GL {
             keepHeader: true,
             skip: 1,
         )
+    ch_gl_collect_bg
+        .view{ it }
 
     
     // clean directory
-    ch_clean_gl = GL_CLEAN (
-        ch_gl_collect_bg,
-        ch_gl_collect_maf,
-        ch_gl_clean.beagle,
-        ch_gl_clean.maf
-    )
+    // ch_clean_gl = GL_CLEAN (
+    //     ch_gl_collect_bg,
+    //     ch_gl_collect_maf,
+    //     ch_gl_clean.beagle,
+    //     ch_gl_clean.maf
+    // )
 
     
     // emit:
