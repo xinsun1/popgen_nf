@@ -67,7 +67,7 @@ process GL_FILTER {
     
     publishDir(
         path: "${params.wdir}gl_chr",
-        mode: 'copy',
+        mode: 'move',
     )
 
     input:
