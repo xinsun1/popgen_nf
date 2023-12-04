@@ -61,7 +61,7 @@ process GL_FILTER {
     cpus 1
     time '2h'
     queue 'cpuqueue'
-    memory '1 GB'
+    memory '32 GB'
 
     // remember to set executor.perCpuMemAllocation = true in config file
     
@@ -168,9 +168,12 @@ process GL_CLEAN {
 process SORT_HEAD {
     tag "$batch_id"
     label 'process_low'
-    executor 'local'
+    executor 'slurm'
+    // executor 'local'
     cpus 1
-    time '12h'
+    time '6h'
+    queue 'cpuqueue'
+    memory '32 GB'
     // remember to set executor.perCpuMemAllocation = true in config file
 
     publishDir(
