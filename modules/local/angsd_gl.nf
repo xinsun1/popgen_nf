@@ -154,7 +154,6 @@ process GL_CLEAN {
     """
     rm -fr ${params.wdir}gl_chr/${name_bg}
     rm -fr ${params.wdir}gl_chr/${name_maf}
-    wait
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
@@ -172,7 +171,7 @@ process SORT_HEAD {
     // remember to set executor.perCpuMemAllocation = true in config file
 
     publishDir(
-        path: "${params.wdir}gl_chr",
+        path: "${params.wdir}",
         mode: 'move',
     )
     
