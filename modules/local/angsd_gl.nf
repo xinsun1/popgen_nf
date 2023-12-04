@@ -154,6 +154,7 @@ process GL_CLEAN {
     """
     rm -fr ${params.wdir}gl_chr/${name_bg}
     rm -fr ${params.wdir}gl_chr/${name_maf}
+    wait
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

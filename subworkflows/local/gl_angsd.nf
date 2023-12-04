@@ -33,7 +33,7 @@ workflow ANGSD_GL {
         params.n,               // val n
         params.mis,             // val mis
     )
-    // merge output
+    // merge output, unsorted
     ch_gl_collect_bg = ch_gl_clean.beagle
         .map {it -> file("${params.wdir}gl_chr/${it}") }
         .collectFile(
@@ -42,24 +42,23 @@ workflow ANGSD_GL {
             keepHeader: true,
             skip: 1,
         )
-    // ch_gl_collect_maf = ch_gl_clean.maf
-    //     .map {it -> file("${params.wdir}gl_chr/${it}")}
-    //     .collectFile(
-    //         name: "${params.batch}.tv_maf${params.maf}_mis${params.mis}.mafs",
-    //         storeDir: params.wdir,
-    //         keepHeader: true,
-    //         skip: 1,
-    //         sort: false,
-    //     )
+    ch_gl_collect_maf = ch_gl_clean.maf
+        .map {it -> file("${params.wdir}gl_chr/${it}") }
+        .collectFile(
+            name: "${params.batch}.tv_maf${params.maf}_mis${params.mis}.mafs",
+            storeDir: params.wdir,
+            keepHeader: true,
+            skip: 1,
+        )
 
     
     // clean directory
-    // ch_clean_gl = GL_CLEAN (
-    //     ch_gl_collect_bg,
-    //     ch_gl_collect_maf,
-    //     ch_gl_clean.beagle,
-    //     ch_gl_collect_maf
-    // )
+    ch_clean_gl = GL_CLEAN (
+        ch_gl_collect_bg,
+        ch_gl_collect_maf,
+        ch_gl_clean.beagle,
+        ch_gl_clean.maf
+    )
 
     
     // emit:
