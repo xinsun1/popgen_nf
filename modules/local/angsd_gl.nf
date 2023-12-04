@@ -192,12 +192,12 @@ process SORT_HEAD {
         sort -V -k1,1 ) | \\
         gzip -c \\
         > sorted.${in_file.name}.gz
-    rm -fr ${in_file}
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         : \$(echo \$(bash -version))
     END_VERSIONS
     """
+    in_file.delete()
 }
 

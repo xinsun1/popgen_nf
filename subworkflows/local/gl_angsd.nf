@@ -58,12 +58,12 @@ workflow ANGSD_GL {
     SORT_HEAD_2(ch_gl_collect_bg)
     
     // clean directory
-    ch_clean_gl = GL_CLEAN (
-        ch_gl_clean.beagle,
-        ch_gl_clean.maf,
-        ch_gl_collect_bg,
-        ch_gl_collect_maf
-    )
+    // ch_clean_gl = GL_CLEAN (
+    //     ch_gl_clean.beagle,
+    //     ch_gl_clean.maf,
+    //     ch_gl_collect_bg,
+    //     ch_gl_collect_maf
+    // )
 
     
     // emit:
