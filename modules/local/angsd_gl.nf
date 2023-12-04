@@ -3,7 +3,7 @@ process GL_CHR {
     label 'process_medium'
     // executor 'slurm'
     executor 'local'
-    cpus 1
+    cpus 2
     time '24h'
     queue 'cpuqueue'
     memory '8 GB'
