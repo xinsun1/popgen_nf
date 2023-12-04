@@ -80,8 +80,10 @@ process GL_FILTER {
 
     output:
     path "${batch}.${region}.is_tv_maf${maf}_mis${mis}", emit: is_f
-    path "${batch}.${region}.tv_maf${maf}_mis${mis}.beagle", emit: beagle
-    path "${batch}.${region}.tv_maf${maf}_mis${mis}.mafs", emit: maf
+    path "${batch}.${region}.tv_maf${maf}_mis${mis}.beagle", emit: beagle_f
+    path "${batch}.${region}.tv_maf${maf}_mis${mis}.mafs", emit: maf_f
+    val "${batch}.${region}.tv_maf${maf}_mis${mis}.beagle", emit: beagle
+    val "${batch}.${region}.tv_maf${maf}_mis${mis}.mafs", emit: maf
     val true, emit: done
 
     when:
