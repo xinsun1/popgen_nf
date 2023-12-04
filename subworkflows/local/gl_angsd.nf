@@ -35,21 +35,22 @@ workflow ANGSD_GL {
     )
     // merge output
     ch_gl_collect_bg = ch_gl_clean.beagle
-        .map {it -> file("${params.wdir}gl_chr/${it}")}
+        .map {it -> file("${params.wdir}gl_chr/${it}") }
         .collectFile(
             name: "${params.batch}.tv_maf${params.maf}_mis${params.mis}.beagle",
             storeDir: params.wdir,
-            //keepHeader: true,
-            //skip: 1,
-            sort: false)
+            keepHeader: true,
+            skip: 1,
+        )
     // ch_gl_collect_maf = ch_gl_clean.maf
     //     .map {it -> file("${params.wdir}gl_chr/${it}")}
     //     .collectFile(
     //         name: "${params.batch}.tv_maf${params.maf}_mis${params.mis}.mafs",
     //         storeDir: params.wdir,
-    //         //keepHeader: true,
-    //         //skip: 1,
-    //         sort: false)
+    //         keepHeader: true,
+    //         skip: 1,
+    //         sort: false,
+    //     )
 
     
     // clean directory

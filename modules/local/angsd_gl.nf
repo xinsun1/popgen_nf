@@ -56,8 +56,8 @@ process GL_CHR {
 process GL_FILTER {
     tag '$batch_id'
     label 'process_low'
-    executor 'slurm'
-    // executor 'local'
+    // executor 'slurm'
+    executor 'local'
     cpus 1
     time '1h'
     queue 'cpuqueue'
