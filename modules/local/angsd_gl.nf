@@ -1,9 +1,9 @@
 process GL_CHR {
     tag '$batch_id'
     label 'process_medium'
-    executor 'slurm'
-    // executor 'local'
-    cpus 2
+    // executor 'slurm'
+    executor 'local'
+    cpus 1
     time '24h'
     queue 'cpuqueue'
     memory '8 GB'
@@ -42,7 +42,7 @@ process GL_CHR {
     angsd -remove_bads 1 -uniqueOnly 1 \\
         -out ${batch}.${region} \\
         ${param_gl} \\
-        -nThreads 2 \\
+        -nThreads 1 \\
         -bam ${list_bam} \\
         -r ${region}
 
@@ -72,8 +72,9 @@ process GL_FILTER {
 
     input:
     val ready
+    path beagle_gz
+    path maf_gz
     val batch
-    path list_bam
     val region
     val maf
     val n
@@ -92,7 +93,7 @@ process GL_FILTER {
     def args = task.ext.args ?: ''
     
     """
-    zcat ${batch}.${region}.mafs.gz | \\
+    zcat ${maf_gz} | \\
         awk '{\\
             if(NR==1){print 1}\\
             else{if(\\
@@ -107,7 +108,7 @@ process GL_FILTER {
             else{print 1}\\
             }}' \\
             > ${batch}.${region}.is_tv_maf${maf}_mis${mis}
-    zcat ${batch}.${region}.beagle.gz | \\
+    zcat ${beagle_gz} | \\
         awk 'NR==FNR \\
             {a[FNR]=\$1} \\
             NR != FNR \\
@@ -115,7 +116,7 @@ process GL_FILTER {
             ${batch}.${region}.is_tv_maf${maf}_mis${mis} \\
             - \\
             > ${batch}.${region}.tv_maf${maf}_mis${mis}.beagle
-    zcat ${batch}.${region}.mafs.gz | \\
+    zcat ${maf_gz} | \\
         awk 'NR==FNR {a[FNR]=\$1} \\
             NR != FNR \\
             {if(a[FNR]==1){print \$0}}' \\
