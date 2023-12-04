@@ -59,10 +59,10 @@ workflow ANGSD_GL {
     
     // clean directory
     ch_clean_gl = GL_CLEAN (
-        ch_gl_collect_bg,
-        ch_gl_collect_maf,
         ch_gl_clean.beagle,
-        ch_gl_clean.maf
+        ch_gl_clean.maf,
+        ch_gl_collect_bg,
+        ch_gl_collect_maf
     )
 
     

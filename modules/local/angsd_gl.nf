@@ -141,11 +141,11 @@ process GL_CLEAN {
     // remember to set executor.perCpuMemAllocation = true in config file
 
     input:
-    val ready_bg
-    val ready_maf
     val name_bg
     val name_maf
-    
+    val ready_bg
+    val ready_maf
+
     when:
     task.ext.when == null || task.ext.when
 
@@ -192,7 +192,8 @@ process SORT_HEAD {
         sort -V -k1,1 ) | \\
         gzip -c \\
         > sorted.${in_file.name}.gz
-    
+    rm -fr ${in_file}
+
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         : \$(echo \$(bash -version))
