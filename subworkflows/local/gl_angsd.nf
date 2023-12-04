@@ -27,8 +27,6 @@ workflow ANGSD_GL {
     // filter gl per region
     ch_gl_clean = GL_FILTER (
         ch_gl_chr.done,         // val ready
-        ch_gl_chr.beagle_gz,    // path beagle_gz
-        ch_gl_chr.maf_gz,       // path maf_gz
         params.batch,           // val batch
         ch_region,              // val region
         params.maf,             // val maf

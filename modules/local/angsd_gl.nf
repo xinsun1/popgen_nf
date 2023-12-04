@@ -67,13 +67,11 @@ process GL_FILTER {
     
     publishDir(
         path: "${params.wdir}gl_chr",
-        mode: 'move',
+        mode: 'copy',
     )
 
     input:
     val ready
-    path beagle_gz
-    path maf_gz
     val batch
     val region
     val maf
@@ -91,7 +89,8 @@ process GL_FILTER {
 
     script:
     def args = task.ext.args ?: ''
-    
+    def maf_gz = file("${params.wdir}gl_chr/${batch}.${region}.mafs.gz")
+    def beagle_gz = file("${params.wdir}gl_chr/${batch}.${region}.beagle.gz")
     """
     zcat ${maf_gz} | \\
         awk '{\\
