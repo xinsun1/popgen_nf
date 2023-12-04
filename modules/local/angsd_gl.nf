@@ -180,7 +180,7 @@ process SORT_HEAD {
     path in_file
     
     output:
-    path sorted.${in_file.name}, emit: sorted_file
+    path "sorted.${in_file.name}.gz", emit: sorted_file
 
     when:
     task.ext.when == null || task.ext.when
