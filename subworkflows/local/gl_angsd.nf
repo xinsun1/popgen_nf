@@ -54,16 +54,16 @@ workflow ANGSD_GL {
         )
     
     // sort and gzip merged file
-    SORT_HEAD_1(ch_gl_collect_maf)
-    SORT_HEAD_2(ch_gl_collect_bg)
+    ch_sort_maf = SORT_HEAD_1(ch_gl_collect_maf)
+    ch_sort_bg = SORT_HEAD_2(ch_gl_collect_bg)
     
     // clean directory
-    // ch_clean_gl = GL_CLEAN (
-    //     ch_gl_clean.beagle,
-    //     ch_gl_clean.maf,
-    //     ch_gl_collect_bg,
-    //     ch_gl_collect_maf
-    // )
+    ch_clean_gl = GL_CLEAN (
+        ch_sort_bg,
+        ch_sort_maf,
+        ch_gl_collect_bg,
+        ch_gl_collect_maf
+    )
 
     
     // emit:

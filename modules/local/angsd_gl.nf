@@ -141,8 +141,8 @@ process GL_CLEAN {
     // remember to set executor.perCpuMemAllocation = true in config file
 
     input:
-    val name_bg
-    val name_maf
+    val ready_sort_bg
+    val ready_sort_maf
     val ready_bg
     val ready_maf
 
@@ -152,8 +152,11 @@ process GL_CLEAN {
     script:
     def args = task.ext.args ?: ''
     """
-    rm -fr ${params.wdir}gl_chr/${name_bg}
-    rm -fr ${params.wdir}gl_chr/${name_maf}
+    rm -fr ${params.wdir}gl_chr/*beagle
+    rm -fr ${params.wdir}gl_chr/*mafs
+
+    rm -fr ${params.wdir}${params.batch}.tv_maf${params.maf}_mis${params.mis}.mafs
+    rm -fr ${params.wdir}${params.batch}.tv_maf${params.maf}_mis${params.mis}.beagle
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
@@ -191,13 +194,12 @@ process SORT_HEAD {
         tail -n +2 ${in_file} | \\
         sort -V -k1,1 ) | \\
         gzip -c \\
-        > sorted.${in_file.name}.gz
+        > sorted.${in_file.name}.gz   
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         : \$(echo \$(bash -version))
     END_VERSIONS
     """
-    in_file.delete()
 }
 
