@@ -1,5 +1,5 @@
 process GL_CHR {
-    tag '$batch_id'
+    tag "$batch_id"
     label 'process_medium'
     // executor 'slurm'
     executor 'local'
@@ -54,7 +54,7 @@ process GL_CHR {
 }
 
 process GL_FILTER {
-    tag '$batch_id'
+    tag "$batch_id"
     label 'process_low'
     // executor 'slurm'
     executor 'local'
@@ -133,7 +133,7 @@ process GL_FILTER {
 }
 
 process GL_CLEAN {
-    tag '$batch_id'
+    tag "$batch_id"
     label 'process_medium'
     executor 'local'
     cpus 1
@@ -163,4 +163,41 @@ process GL_CLEAN {
     """
 }
 
+process SORT_HEAD {
+    tag "$batch_id"
+    label 'process_low'
+    executor 'local'
+    cpus 1
+    time '12h'
+    // remember to set executor.perCpuMemAllocation = true in config file
+
+    publishDir(
+        path: "${params.wdir}gl_chr",
+        mode: 'move',
+    )
+    
+    input:
+    path in_file
+    
+    output:
+    path sorted.${in_file.name}, emit: sorted_file
+
+    when:
+    task.ext.when == null || task.ext.when
+
+    script:
+    def args = task.ext.args ?: ''
+    """
+    ( head -1 ${in_file} && \\
+        tail -n +2 ${in_file} | \\
+        sort -V -k1,1 ) | \\
+        gzip -c \\
+        > sorted.${in_file.name}.gz
+    
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        : \$(echo \$(bash -version))
+    END_VERSIONS
+    """
+}
 

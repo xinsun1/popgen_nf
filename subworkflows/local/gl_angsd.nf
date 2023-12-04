@@ -4,7 +4,7 @@
 
 nextflow.enable.dsl = 2
 
-include { GL_CHR; GL_CLEAN; GL_FILTER; } from '../../modules/local/angsd_gl.nf'
+include { GL_CHR; GL_CLEAN; GL_FILTER; SORT_HEAD } from '../../modules/local/angsd_gl.nf'
 
 workflow ANGSD_GL {
     take:
@@ -50,9 +50,10 @@ workflow ANGSD_GL {
             keepHeader: true,
             skip: 1,
         )
-    ch_gl_collect_bg
-        .view{ it }
-
+    
+    // sort and gzip merged file
+    SORT_HEAD(ch_gl_collect_maf)
+    SORT_HEAD(ch_gl_collect_bg)
     
     // clean directory
     // ch_clean_gl = GL_CLEAN (
