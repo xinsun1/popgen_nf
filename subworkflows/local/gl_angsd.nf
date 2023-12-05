@@ -27,43 +27,43 @@ workflow ANGSD_GL {
         )
 
     // filter gl per region
-    ch_gl_clean = GL_FILTER (
-        ch_gl_chr.done,         // val ready
-        params.batch,           // val batch
-        ch_region,              // val region
-        params.maf,             // val maf
-        params.n,               // val n
-        params.mis,             // val mis
-    )
-    // merge output, unsorted
-    ch_gl_collect_bg = ch_gl_clean.beagle
-        .map {it -> file("${params.wdir}gl_chr/${it}") }
-        .collectFile(
-            name: "${params.batch}.tv_maf${params.maf}_mis${params.mis}.beagle",
-            storeDir: params.wdir,
-            keepHeader: true,
-            skip: 1,
-        )
-    ch_gl_collect_maf = ch_gl_clean.maf
-        .map {it -> file("${params.wdir}gl_chr/${it}") }
-        .collectFile(
-            name: "${params.batch}.tv_maf${params.maf}_mis${params.mis}.mafs",
-            storeDir: params.wdir,
-            keepHeader: true,
-            skip: 1,
-        )
-    
-    // sort and gzip merged file
-    ch_sort_maf = SORT_HEAD_1(ch_gl_collect_maf)
-    ch_sort_bg = SORT_HEAD_2(ch_gl_collect_bg)
-    
-    // clean directory
-    ch_clean_gl = GL_CLEAN (
-        ch_sort_bg,
-        ch_sort_maf,
-        ch_gl_collect_bg,
-        ch_gl_collect_maf
-    )
+    // ch_gl_clean = GL_FILTER (
+    //     ch_gl_chr.done,         // val ready
+    //     params.batch,           // val batch
+    //     ch_region,              // val region
+    //     params.maf,             // val maf
+    //     params.n,               // val n
+    //     params.mis,             // val mis
+    // )
+    // // merge output, unsorted
+    // ch_gl_collect_bg = ch_gl_clean.beagle
+    //     .map {it -> file("${params.wdir}gl_chr/${it}") }
+    //     .collectFile(
+    //         name: "${params.batch}.tv_maf${params.maf}_mis${params.mis}.beagle",
+    //         storeDir: params.wdir,
+    //         keepHeader: true,
+    //         skip: 1,
+    //     )
+    // ch_gl_collect_maf = ch_gl_clean.maf
+    //     .map {it -> file("${params.wdir}gl_chr/${it}") }
+    //     .collectFile(
+    //         name: "${params.batch}.tv_maf${params.maf}_mis${params.mis}.mafs",
+    //         storeDir: params.wdir,
+    //         keepHeader: true,
+    //         skip: 1,
+    //     )
+    // 
+    // // sort and gzip merged file
+    // ch_sort_maf = SORT_HEAD_1(ch_gl_collect_maf)
+    // ch_sort_bg = SORT_HEAD_2(ch_gl_collect_bg)
+    // 
+    // // clean directory
+    // ch_clean_gl = GL_CLEAN (
+    //     ch_sort_bg,
+    //     ch_sort_maf,
+    //     ch_gl_collect_bg,
+    //     ch_gl_collect_maf
+    // )
 
     
     // emit:

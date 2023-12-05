@@ -6,7 +6,7 @@ process GL_CHR {
     cpus 1
     time '24h'
     queue 'cpuqueue'
-    memory '8 GB'
+    memory '16 GB'
     // remember to set executor.perCpuMemAllocation = true in config file
 
 
