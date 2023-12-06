@@ -4,9 +4,8 @@
 
 nextflow.enable.dsl = 2
 
-include { GL_CHR; GL_CLEAN; GL_FILTER; }    from '../../modules/local/angsd_gl.nf'
-include { SORT_HEAD as SORT_HEAD_1;    }    from '../../modules/local/angsd_gl.nf'
-include { SORT_HEAD as SORT_HEAD_2;    }    from '../../modules/local/angsd_gl.nf'
+include { GL_CHR;                    }    from '../../modules/local/angsd_gl.nf'
+include { GL_FILTER;                 }    from '../../modules/local/angsd_gl.nf'
 
 workflow ANGSD_GL {
     take:
@@ -26,16 +25,17 @@ workflow ANGSD_GL {
             ch_region,
             params.gl_param
             )
+        gl_done = ch_gl_chr.done.collect()
     }
     else {
-        ch_gl_chr.done = true
+        gl_done = true
     }
 
 
     // filter gl per region
     if ( params.run_filter == true) {
         ch_gl_filter = GL_FILTER (
-            ch_gl_chr.done,         // val ready
+            gl_done,                // val ready
             params.batch,           // val batch
             file(list_region),      // path region
             params.maf,             // val maf

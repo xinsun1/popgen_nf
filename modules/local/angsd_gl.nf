@@ -100,8 +100,8 @@ process GL_FILTER {
     f_mafs="${batch}.tv_maf${maf}_mis${mis}.mafs"
     f_beagle="${batch}.tv_maf${maf}_mis${mis}.beagle"
 
-    idx = 1
-    for region in $(less ${list_region})
+    idx=1
+    for region in \$(less ${list_region})
     do
         maf_gz="${params.wdir}gl_chr/${batch}.\${region}.mafs.gz"
         beagle_gz="${params.wdir}gl_chr/${batch}.\${region}.beagle.gz"
@@ -109,7 +109,7 @@ process GL_FILTER {
 
         # is first file
         if [ \$idx -eq 1 ]; then
-            zcat \${maf_gz} | head -1 > \${f_maf}
+            zcat \${maf_gz} | head -1 > \${f_mafs}
             zcat \${beagle_gz} | head -1 > \${f_beagle}
         fi
         
@@ -149,6 +149,9 @@ process GL_FILTER {
             tail -n +2 \\
             >> \${f_mafs} &
         wait
+
+        (( idx+=1 ))
+
     done
 
     gzip \${f_beagle} &
