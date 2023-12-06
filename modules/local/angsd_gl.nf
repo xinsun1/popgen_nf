@@ -58,32 +58,36 @@ process GL_FILTER {
     label 'process_low'
     executor 'slurm'
     // executor 'local'
-    cpus 1
-    time '2h'
+    cpus 2
+    time '12h'
     queue 'cpuqueue'
-    memory '32 GB'
+    memory '24 GB'
 
     // remember to set executor.perCpuMemAllocation = true in config file
     
     publishDir(
-        path: "${params.wdir}gl_chr",
-        mode: 'move',
+        path:     "${params.wdir}gl_chr",
+        pattern:  "${batch}.*.is_tv_maf${maf}_mis${mis}",
+        mode:     'move',
+    )
+    publishDir(
+        path:     "${params.wdir}",
+        pattern:  "${batch}.tv_maf${maf}_mis${mis}.*gz",
+        mode:     'move',
     )
 
     input:
     val ready
     val batch
-    val region
+    path list_region
     val maf
     val n
     val mis
 
     output:
-    path "${batch}.${region}.is_tv_maf${maf}_mis${mis}", emit: is_f
-    path "${batch}.${region}.tv_maf${maf}_mis${mis}.beagle", emit: beagle_f
-    path "${batch}.${region}.tv_maf${maf}_mis${mis}.mafs", emit: maf_f
-    val "${batch}.${region}.tv_maf${maf}_mis${mis}.beagle", emit: beagle
-    val "${batch}.${region}.tv_maf${maf}_mis${mis}.mafs", emit: maf
+    path "${batch}.*.is_tv_maf${maf}_mis${mis}", emit: is_f
+    path "${batch}.tv_maf${maf}_mis${mis}.beagle.gz", emit: beagle
+    path "${batch}.tv_maf${maf}_mis${mis}.mafs.gz", emit: maf
     val true, emit: done
 
     when:
@@ -91,10 +95,26 @@ process GL_FILTER {
 
     script:
     def args = task.ext.args ?: ''
-    def maf_gz = file("${params.wdir}gl_chr/${batch}.${region}.mafs.gz")
-    def beagle_gz = file("${params.wdir}gl_chr/${batch}.${region}.beagle.gz")
+
     """
-    zcat ${maf_gz} | \\
+    f_mafs="${batch}.tv_maf${maf}_mis${mis}.mafs"
+    f_beagle="${batch}.tv_maf${maf}_mis${mis}.beagle"
+
+    idx = 1
+    for region in $(less ${list_region})
+    do
+        maf_gz="${params.wdir}gl_chr/${batch}.\${region}.mafs.gz"
+        beagle_gz="${params.wdir}gl_chr/${batch}.\${region}.beagle.gz"
+        region_filter="${batch}.\${region}.is_tv_maf${maf}_mis${mis}"
+
+        # is first file
+        if [ \$idx -eq 1 ]; then
+            zcat \${maf_gz} | head -1 > \${f_maf}
+            zcat \${beagle_gz} | head -1 > \${f_beagle}
+        fi
+        
+        # check filter 
+        zcat \${maf_gz} | \\
         awk '{\\
             if(NR==1){print 1}\\
             else{if(\\
@@ -108,101 +128,36 @@ process GL_FILTER {
             ){print 0}\\
             else{print 1}\\
             }}' \\
-            > ${batch}.${region}.is_tv_maf${maf}_mis${mis}
-    zcat ${beagle_gz} | \\
+            > \${region_filter}
+        
+        zcat \${beagle_gz} | \\
         awk 'NR==FNR \\
             {a[FNR]=\$1} \\
             NR != FNR \\
             {if(a[FNR]==1){print \$0}}' \\
-            ${batch}.${region}.is_tv_maf${maf}_mis${mis} \\
-            - \\
-            > ${batch}.${region}.tv_maf${maf}_mis${mis}.beagle
-    zcat ${maf_gz} | \\
+            \${region_filter} \\
+            - | \\
+            tail -n +2 \\
+            >> \${f_beagle} &
+
+        zcat \${maf_gz} | \\
         awk 'NR==FNR {a[FNR]=\$1} \\
             NR != FNR \\
             {if(a[FNR]==1){print \$0}}' \\
-            ${batch}.${region}.is_tv_maf${maf}_mis${mis} \\
-            - \\
-            > ${batch}.${region}.tv_maf${maf}_mis${mis}.mafs
+            \${region_filter} \\
+            - | \\
+            tail -n +2 \\
+            >> \${f_mafs} &
+        wait
+    done
 
+    gzip \${f_beagle} &
+    gzip \${f_mafs} &
+    wait 
+    
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         : \$(echo bash))
     END_VERSIONS
     """
 }
-
-process GL_CLEAN {
-    tag "$batch_id"
-    label 'process_medium'
-    executor 'local'
-    cpus 1
-    time '2h'
-    // remember to set executor.perCpuMemAllocation = true in config file
-
-    input:
-    val ready_sort_bg
-    val ready_sort_maf
-    val ready_bg
-    val ready_maf
-
-    when:
-    task.ext.when == null || task.ext.when
-
-    script:
-    def args = task.ext.args ?: ''
-    """
-    rm -fr ${params.wdir}gl_chr/*beagle
-    rm -fr ${params.wdir}gl_chr/*mafs
-
-    rm -fr ${params.wdir}${params.batch}.tv_maf${params.maf}_mis${params.mis}.mafs
-    rm -fr ${params.wdir}${params.batch}.tv_maf${params.maf}_mis${params.mis}.beagle
-
-    cat <<-END_VERSIONS > versions.yml
-    "${task.process}":
-        : \$(echo \$(bash -version))
-    END_VERSIONS
-    """
-}
-
-process SORT_HEAD {
-    tag "$batch_id"
-    label 'process_low'
-    executor 'slurm'
-    // executor 'local'
-    cpus 1
-    time '6h'
-    queue 'cpuqueue'
-    memory '32 GB'
-    // remember to set executor.perCpuMemAllocation = true in config file
-
-    publishDir(
-        path: "${params.wdir}",
-        mode: 'move',
-    )
-    
-    input:
-    path in_file
-    
-    output:
-    path "sorted.${in_file.name}.gz", emit: sorted_file
-
-    when:
-    task.ext.when == null || task.ext.when
-
-    script:
-    def args = task.ext.args ?: ''
-    """
-    ( head -1 ${in_file} && \\
-        tail -n +2 ${in_file} | \\
-        sort -V -k1,1 ) | \\
-        gzip -c \\
-        > sorted.${in_file.name}.gz   
-
-    cat <<-END_VERSIONS > versions.yml
-    "${task.process}":
-        : \$(echo \$(bash -version))
-    END_VERSIONS
-    """
-}
-
