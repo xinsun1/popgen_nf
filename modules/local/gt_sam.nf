@@ -1,12 +1,12 @@
 process MPILE_UP_CALL_REGION {
     tag '$batch_id'
     label 'process_medium'
-    // executor 'slurm'
-    executor 'local'
+    executor 'slurm'
+    // executor 'local'
     cpus 1
     time '48h'
     queue 'cpuqueue'
-    memory '8 GB'
+    memory '16 GB'
     // remember to set executor.perCpuMemAllocation = true in config file
 
 
