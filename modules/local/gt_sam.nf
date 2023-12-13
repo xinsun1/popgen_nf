@@ -1,7 +1,8 @@
 process MPILE_UP_CALL_REGION {
     tag '$batch_id'
     label 'process_medium'
-    executor 'slurm'
+    // executor 'slurm'
+    executor 'local'
     cpus 1
     time '48h'
     queue 'cpuqueue'
@@ -19,7 +20,14 @@ process MPILE_UP_CALL_REGION {
     )
 
     input:
-    tuple val(meta_gt), val(region)
+    val batch
+    path ref
+    path list_bam
+    val param_mpileup
+    val param_call
+    val region
+
+    // tuple val(meta_gt), val(region)
 
     output:
     path "*.vcf.gz", emit: vcf
@@ -32,17 +40,17 @@ process MPILE_UP_CALL_REGION {
     def args = task.ext.args ?: ''
     """
     bcftools mpileup \\
-        -Ou -f ${meta_gt.ref} \\
+        -Ou -f ${ref} \\
         -a FORMAT/AD,FORMAT/DP \\
-        -b ${meta_gt.list_bam} \\
-        ${meta_gt.param_mpileup} \\
+        -b ${list_bam} \\
+        ${param_mpileup} \\
         -r ${region} | \\
         bcftools call \\
-        ${meta_gt.param_call} \\
+        ${param_call} \\
         -vmO z \\
-        -o ${meta_gt.batch}.${region}.vcf.gz
+        -o ${batch}.${region}.vcf.gz
 
-    bcftools index ${meta_gt.batch}.${region}.vcf.gz
+    bcftools index ${batch}.${region}.vcf.gz
     
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
