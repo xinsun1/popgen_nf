@@ -1,0 +1,31 @@
+singularity {
+        enabled = true
+        autoMounts = true
+        cacheDir = '/maps/projects/mjolnir1/people/gnr216/a-software/sigularity_module'
+	runOptions = "-B /maps/projects/mjolnir1/"
+}
+
+executor.perCpuMemAllocation = true
+executor.queueSize = 40
+
+params {
+    	// batch 
+    	list_region               = '/maps/projects/mjolnir1/people/gnr216/1-wolf/1-gl/italian_pw/list.chr1-38'
+    	wdir                      = '/maps/projects/mjolnir1/people/gnr216/1-wolf/1-gl/italian_pw/'
+	batch                     = 'ita_short'
+	list_bam                  = '/maps/projects/mjolnir1/people/gnr216/1-wolf/1-gl/italian_pw/list.bam.short'
+
+        // angsd
+	run_gl                    = false
+	gl_param                  = "-GL 2 -doGlf 2 -doMajorMinor 1 -doMaf 1 -minMapQ 30 -minQ 20 -checkBamHeaders 0"
+   
+	// filter
+	run_filter                = true
+	maf			  = 5
+	mis			  = 50
+	n		          = 62
+
+	// clean
+	run_clean                 = true
+}
+
